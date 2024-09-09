@@ -7,6 +7,7 @@ import WhatWeOffer from "./pages/Offers";
 import TrainingWorkshops from "./pages/Workshop";
 // import DiscussionForum from './pages/DiscussionForum';
 import Projects from "./pages/ProjectSlider";
+import LoginPage from "./components/login"; // Ensure correct path to Login.js
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Landing />} />
                     <Route path="/what-we-offer" element={<WhatWeOffer />} />
+                    <Route path="/login" element={<LoginPage />} /> {/* Add Login route */}
                     {/* <Route path="/training-workshops" element={<TrainingWorkshops />} />
                     <Route path="/discussion-forum" element={<DiscussionForum />} />
                     <Route path="/projects" element={<Projects />} /> */}

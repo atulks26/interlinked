@@ -1,4 +1,5 @@
 import { React, useEffect } from "react";
+import { Link } from "react-router-dom"; // Import Link for navigation
 import "../styles/Navbar.css";
 
 function Navbar() {
@@ -32,13 +33,13 @@ function Navbar() {
     return (
         <nav className="navbar">
             <div className="navbar-logo">
-                <img src="path_to_mcd_logo.png" />
+                <img src="path_to_mcd_logo.png" alt="Logo" />
                 <h1>App Name</h1>
             </div>
 
             <div className="navbar-links">
-                <a href="/">Home</a>
-                <a href="/what-we-offer">Offers</a>
+                <Link to="/">Home</Link>
+                <Link to="/what-we-offer">Offers</Link>
 
                 {/* Dropdown for Departments */}
                 <div className="dropdown">
@@ -90,18 +91,15 @@ function Navbar() {
                     </div>
                 </div>
 
-                <a href="/training">Training</a>
-                <a href="/discussion-forum">Forum</a>
-                <a href="#projects">Projects</a>
+                <Link to="/training">Training</Link>
+                <Link to="/discussion-forum">Forum</Link>
+                <Link to="#projects">Projects</Link>
             </div>
 
-            {/* <div className="navbar-flag">
-                <img src="path_to_india_flag.png" alt="Indian Flag" />
-            </div> */}
-
-            <a href="#online-services" className="navbar-online-services">
+            {/* Log In Link */}
+            <Link to="/login" className="navbar-online-services">
                 Log In
-            </a>
+            </Link>
         </nav>
     );
 }
