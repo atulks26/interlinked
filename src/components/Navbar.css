@@ -1,0 +1,109 @@
+/* Navbar.css */
+
+/* Basic navbar styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #005DA3; /* MCD blue */
+    padding: 10px 20px;
+  }
+  
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-logo img {
+    height: 50px;
+    margin-right: 10px;
+  }
+  
+  .navbar-logo h1 {
+    color: white;
+    font-size: 20px;
+  }
+  
+  .navbar-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px;
+  }
+  
+  /* Dropdown menu */
+  .dropdown {
+    position: relative;
+  }
+  
+  .dropdown-toggle {
+    color: white;
+    font-size: 16px;
+    text-decoration: none;
+    padding: 10px;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: 100%; /* Dropdown appears below the button */
+    left: 0;
+    width: 700px; /* Adjust the width for columns */
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    border-radius: 5px;
+  }
+  
+  /* Make dropdown appear on hover */
+  .dropdown:hover .dropdown-content {
+    display: flex;
+  }
+  
+  /* Style for each section/column in the dropdown */
+  .dropdown-section {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .dropdown-section h4 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #005DA3;
+    font-weight: bold;
+  }
+  
+  .dropdown-section a {
+    display: block;
+    padding: 5px 0;
+    color: black;
+    text-decoration: none;
+  }
+  
+  .dropdown-section a:hover {
+    color: #005DA3;
+  }
+  
+  .navbar-flag img {
+    height: 40px;
+  }
+  
+  .navbar-online-services {
+    background-color: #D50032;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .navbar-online-services:hover {
+    background-color: #B0002A;
+  }
+  
