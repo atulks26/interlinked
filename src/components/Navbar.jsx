@@ -1,82 +1,109 @@
-import React from 'react';
-import './Navbar.css'; // Import the CSS file
+import { React, useEffect } from "react";
+import "../styles/Navbar.css";
 
 function Navbar() {
-  return (
-    <nav className="navbar">
-      <div className="navbar-logo">
-        <img src="path_to_mcd_logo.png" alt="MCD Logo" />
-        <h1>Municipal Corporation of Delhi</h1>
-      </div>
+    const DropdownMenu = () => {
+        useEffect(() => {
+            const links = document.querySelectorAll(".dropdown-content a");
+            links.forEach((link) => {
+                link.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    const department = this.textContent
+                        .trim()
+                        .toLowerCase()
+                        .replace(/&/g, "and")
+                        .replace(/\s+/g, "-")
+                        .replace(/[^a-z0-9\-]/g, "");
 
-      <div className="navbar-links">
-        <a href="#home">Home Page</a>
-        <a href="#about">About Us</a>
+                    window.location.href = `/department/${department}`;
+                });
+            });
 
-        {/* Dropdown for Departments */}
-        <div className="dropdown">
-          <a href="#departments" className="dropdown-toggle">Departments</a>
-          <div className="dropdown-content">
-            <div className="dropdown-section">
-              <h4>Column 1</h4>
-              <a href="#">ADVERTISEMENT</a>
-              <a href="#">ARCHITECTURE DEPARTMENT</a>
-              <a href="#">ASSESSMENT AND COLLECTION DEPARTMENT</a>
-              <a href="#">AYUSH DEPARTMENT</a>
-              <a href="#">BUILDING DEPARTMENT</a>
-              <a href="#">CENTRAL ESTABLISHMENT</a>
-              <a href="#">COMMITTEE AND CORPORATION</a> 
-              <a href="#">MUNICIPAL SECRETARY OFFICE</a>
-              <a href="#">Organization and Method department</a>
-              <a href="#">COMMUNITY SERVICES</a>
+            return () => {
+                links.forEach((link) =>
+                    link.removeEventListener("click", () => {})
+                );
+            };
+        }, []);
+    };
+
+    DropdownMenu();
+
+    return (
+        <nav className="navbar">
+            <div className="navbar-logo">
+                <img src="path_to_mcd_logo.png" />
+                <h1>App Name</h1>
             </div>
-            <div className="dropdown-section">
-              <h4>Column 2</h4>
-              <a href="#">DIRECTORATE OF INQUIRY</a>
-              <a href="#">DIRECTORATE OF PRESS AND INFORMATION</a>
-              <a href="#">Department of Environmental Management</a>
-              <a href="#">EDUCATION</a>
-              <a href="#">ELECTION DEPARTMENT</a>
-              <a href="#">ENGINEERING DEPARTMENT</a>
-              <a href="#">Electrical And Mechanical Department</a>
-              <a href="#">PUBLIC HEALTH DEPARTMENT</a>
-              <a href="#">REMUNERATIVE PROJECT CELL</a>
-              <a href="#">STATUTORY AUDIT DEPARTMENT</a>
-              <a href="#">FACTORY LICENSE</a>
-              <a href="#">FINANCE DEPARTMENT</a>
-              
+
+            <div className="navbar-links">
+                <a href="/">Home</a>
+                <a href="/what-we-offer">Offers</a>
+
+                {/* Dropdown for Departments */}
+                <div className="dropdown">
+                    <a href="#departments" className="dropdown-toggle">
+                        Departments
+                    </a>
+                    <div className="dropdown-content">
+                        <div className="dropdown-section">
+                            <a>Architecture Department</a>
+                            <a>Advertisement</a>
+                            <a>Assessment and Collection Department</a>
+                            <a>Ayush Department</a>
+                            <a>Building Department</a>
+                            <a>Central Establishment</a>
+                            <a>Committee and Corporation</a>
+                            <a>Municipal Secretary Office</a>
+                            <a>Organization and Method Department</a>
+                            <a>Community Services</a>
+                        </div>
+                        <div className="dropdown-section">
+                            <a>Directorate of Inquiry</a>
+                            <a>Directorate of Press and Information</a>
+                            <a>Department of Environmental Management</a>
+                            <a>Education</a>
+                            <a>Election Department</a>
+                            <a>Engineering Department</a>
+                            <a>Electrical and Mechanical Department</a>
+                            <a>Public Health Department</a>
+                            <a>Remunerative Project Cell</a>
+                            <a>Statutory Audit Department</a>
+                            <a>Factory License</a>
+                            <a>Finance Department</a>
+                        </div>
+                        <div className="dropdown-section">
+                            <a>Hackney Carriage</a>
+                            <a>Horticulture Department</a>
+                            <a>Hospital Administration</a>
+                            <a>Information Technology</a>
+                            <a>Labour Welfare Department</a>
+                            <a>Land and Estate</a>
+                            <a>Language Department</a>
+                            <a>Law Department</a>
+                            <a>Licensing Department</a>
+                            <a>Town Planning</a>
+                            <a>Toll Tax</a>
+                            <a>Veterinary</a>
+                            <a>Vigilance</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/training">Training</a>
+                <a href="/discussion-forum">Forum</a>
+                <a href="#projects">Projects</a>
             </div>
-            <div className="dropdown-section">
-              <h4>Column 3</h4>
-              <a href="#">HACKNEY CARRIAGE</a>
-              <a href="#">HORTICULTURE DEPARTMENT</a>
-              <a href="#">HOSPITAL ADMINISTRATION</a>
-              <a href="#">INFORMATION TECHNOLOGY</a>
-              <a href="#">LABOUR WELFARE DEPARTMENT</a>
-              <a href="#">LAND AND ESTATE</a>
-              <a href="#">LANGUAGE DEPARTMENT</a>
-              <a href="#">LAW DEPARTMENT</a>
-              <a href="#">LICENSING DEPARTMENT</a>
-              <a href="#">TOWN PLANNING</a>
-              <a href="#">Toll Tax</a>
-              <a href="#">VETERINARY</a>
-              <a href="#">VIGILANCE</a>
-            </div>
-          </div>
-        </div>
 
-        <a href="#zones">Zones</a>
-        <a href="#downloads">Downloads</a>
-        <a href="#tenders">Tenders</a>
-      </div>
+            {/* <div className="navbar-flag">
+                <img src="path_to_india_flag.png" alt="Indian Flag" />
+            </div> */}
 
-      <div className="navbar-flag">
-        <img src="path_to_india_flag.png" alt="Indian Flag" />
-      </div>
-
-      <a href="#online-services" className="navbar-online-services">Online Services</a>
-    </nav>
-  );
+            <a href="#online-services" className="navbar-online-services">
+                Log In
+            </a>
+        </nav>
+    );
 }
 
 export default Navbar;
