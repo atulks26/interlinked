@@ -43,8 +43,9 @@ function Navbar() {
 
                 {/* Dropdown for Departments */}
                 <div className="dropdown">
-                    <a href="#departments" className="dropdown-toggle">
+                    <a className="dropdown-toggle">
                         Departments
+                        {/* Leads to list of departements? */}
                     </a>
                     <div className="dropdown-content">
                         <div className="dropdown-section">
@@ -93,7 +94,7 @@ function Navbar() {
 
                 <Link to="/training">Training</Link>
                 <Link to="/discussion-forum">Forum</Link>
-                <Link to="#projects">Projects</Link>
+                <Link to="/projects">Projects</Link>
             </div>
 
             {/* Log In Link */}
