@@ -1,0 +1,304 @@
+/* General Layout */
+.department-forum-page {
+    display: flex;
+    height: 100vh;
+    background-color: #F4F5F7; /* Light background */
+    overflow: hidden;
+}
+
+/* Sidebar Styling */
+.department-sidebar {
+    width: 260px; /* Slightly wider sidebar for better spacing */
+    background: linear-gradient(180deg, #3F0E40, #5A1F5F); /* Gradient for modern look */
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.department-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.department-sidebar li {
+    margin-bottom: 15px; /* Space between list items */
+}
+
+.department-sidebar a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.department-sidebar a:hover {
+    text-decoration: underline;
+}
+
+/* Add Channel Icon Styling */
+.department-sidebar .add-channel {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #B0B0B0;
+    border-radius: 8px;
+    transition: color 0.3s, background-color 0.3s;
+}
+
+.department-sidebar .add-channel:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle background on hover */
+}
+
+/* Profile Section Styling */
+.profile-section {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #4A2C5B;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 2px solid white; /* White border around profile pic */
+}
+
+.profile-info h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.profile-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #B0B0B0;
+}
+
+/* Icons Styling for Sidebar */
+.icon {
+    margin-right: 12px;
+    font-size: 18px; /* Slightly larger icon size */
+}
+
+/* Content Area Styling */
+.department-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* Header Styling */
+.department-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #EDEDED;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px; /* Softer rounded corners */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.department-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.member-count {
+    font-size: 15px;
+    color: #B0B0B0;
+    margin-top: 5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.settings-icon {
+    font-size: 20px;
+    color: #3F0E40;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: color 0.3s;
+}
+
+.settings-icon:hover {
+    color: #5A1F5F;
+}
+
+/* Message List Styling */
+.message-list {
+    padding: 15px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #FAFAFA;
+}
+
+/* Message Item Styling */
+.message-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Enhanced shadow */
+    font-size: 14px; /* Slightly larger font size */
+}
+
+/* Message Meta Styling */
+.message-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.message-meta span {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Message Input Styling */
+.message-input {
+    padding: 15px;
+    border-top: 1px solid #EDEDED;
+    display: flex;
+    background-color: #ffffff;
+}
+
+.message-input textarea {
+    flex-grow: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #EDEDED;
+    resize: none;
+    font-size: 14px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+}
+
+.message-input textarea:focus {
+    outline: none;
+    border-color: #3F0E40;
+}
+
+.message-input button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    background-color: #3F0E40;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.message-input button:hover {
+    background-color: #5A1F5F;
+}
+
+/* Connect Section Styling */
+.connect-section {
+    margin-top: 20px;
+}
+
+.connect-link {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #4A2C5B;
+    transition: background-color 0.3s;
+}
+
+.connect-link:hover {
+    background-color: #5A1F5F;
+}
+
+.connect-link .icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+/* Replies Section Styling */
+.replies {
+    margin-top: 15px;
+    margin-left: 20px;
+}
+
+.reply-item {
+    padding: 8px;
+    background-color: #F4F4F4;
+    border-left: 4px solid #007bff;
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+
+.reply-item p {
+    margin: 0;
+}
+
+.reply-item span {
+    font-size: 11px;
+    color: #888;
+    display: block;
+    margin-top: 4px;
+}
+
+.reply-input {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.reply-input textarea {
+    width: 100%;
+    height: 60px;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.reply-input button {
+    align-self: flex-end;
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.reply-input button:hover {
+    background-color: #0056b3;
+}

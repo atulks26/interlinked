@@ -1,0 +1,181 @@
+/* Container for the form */
+.registration-form-container {
+    padding: 2rem; /* Adds padding around the form */
+    max-width: 80%; /* Limits the maximum width */
+    margin: 2rem auto; /* Centers the form horizontally */
+    background-color: #ffffff; /* White background for the form */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for a lifted effect */
+}
+
+/* Title of the form */
+.registration-form-container h1 {
+    font-size: 2rem; /* Larger font size for the title */
+    font-weight: 600; /* Semi-bold text */
+    margin-bottom: 1.5rem; /* Space below the title */
+    text-align: center; /* Center align the title */
+}
+
+/* Form sections */
+.registration-form-container form > div {
+    margin-bottom: 1.5rem; /* Space between form fields */
+}
+
+/* Labels for form fields */
+.registration-form-container label {
+    display: block; /* Makes label a block element */
+    font-size: 1.125rem; /* Slightly larger font size for better readability */
+    font-weight: 600; /* Semi-bold for better emphasis */
+    margin-bottom: 0.75rem; /* Increased space below labels */
+    color: #4a4a4a; /* Slightly lighter dark color for a softer look */
+    text-transform: uppercase; /* Uppercase for a modern look */
+    letter-spacing: 0.5px; /* Slight letter spacing for clarity */
+    transition: color 0.3s ease; /* Smooth color transition on focus */
+}
+
+.registration-form-container label:hover {
+    color: #007bff; /* Change color on hover for interactive feedback */
+}
+/* File input fields */
+.registration-form-container input[type="file"] {
+    border: 1px solid #d1d5db; /* Light gray border */
+    padding: 0.5rem; /* Padding inside the input */
+    background: #f9f9f9; /* Light background */
+    border-radius: 6px; /* Rounded corners */
+    transition: border-color 0.3s ease, background-color 0.3s ease; /* Smooth transitions */
+    font-size: 1rem; /* Font size for text */
+    color: #333; /* Dark text color */
+    display: block; /* Make the input block-level */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Customize the file input button appearance */
+.registration-form-container input[type="file"]::-webkit-file-upload-button {
+    background: #007bff; /* Blue background */
+    color: #ffffff; /* White text */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 0.5rem 1rem; /* Padding for the button */
+    font-size: 1rem; /* Font size */
+    font-weight: 600; /* Semi-bold text */
+    cursor: pointer; /* Pointer cursor */
+    text-transform: uppercase; /* Uppercase text */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+}
+
+/* Hover state for file input button */
+.registration-form-container
+    input[type="file"]::-webkit-file-upload-button:hover {
+    background: #0056b3; /* Darker blue on hover */
+    color: #f0f0f0; /* Slightly lighter text color on hover */
+}
+
+/* Focus state for file input field */
+.registration-form-container input[type="file"]:focus {
+    border-color: #007bff; /* Blue border on focus */
+    background: #f0f0f0; /* Slightly darker background on focus */
+    outline: none; /* Remove default outline */
+}
+/* File input fields */
+.registration-form-container input[type="file"] {
+    border: 1px solid #d1d5db; /* Light gray border */
+    padding: 0.5rem; /* Padding inside the input */
+    background: #f9f9f9; /* Light background */
+    border-radius: 6px; /* Rounded corners */
+    transition: border-color 0.3s ease, background-color 0.3s ease; /* Smooth transitions */
+    font-size: 1rem; /* Font size for text */
+    color: #333; /* Dark text color */
+    display: block; /* Make the input block-level */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Customize the file input button appearance */
+.registration-form-container input[type="file"]::-webkit-file-upload-button {
+    background: #2f3b48; /* Blue background */
+    color: #ffffff; /* White text */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 0.5rem 1rem; /* Padding for the button */
+    font-size: 1rem; /* Font size */
+    font-weight: 600; /* Semi-bold text */
+    cursor: pointer; /* Pointer cursor */
+    text-transform: uppercase; /* Uppercase text */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+}
+
+/* Hover state for file input button */
+.registration-form-container
+    input[type="file"]::-webkit-file-upload-button:hover {
+    background: #0056b3; /* Darker blue on hover */
+    color: #f0f0f0; /* Slightly lighter text color on hover */
+}
+
+/* Focus state for file input field */
+.registration-form-container input[type="file"]:focus {
+    border-color: #bcd5f0; /* Blue border on focus */
+    background: #f0f0f0; /* Slightly darker background on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Input fields and select boxes */
+.registration-form-container input,
+.registration-form-container select {
+    width: 100%; /* Full width input */
+    padding: 0.875rem; /* Slightly increased padding for better touch targets */
+    font-size: 1rem; /* Font size for text */
+    border: 2px solid #d1d5db; /* Light gray border */
+    border-radius: 6px; /* Slightly more rounded corners for a softer look */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Enhanced inner shadow */
+    background-color: #ffffff; /* White background for clarity */
+    transition: all 0.3s ease; /* Smooth transition for all state changes */
+}
+
+/* Focus state for inputs and select */
+.registration-form-container input:focus,
+.registration-form-container select:focus {
+    border-color: #007bff; /* Blue border on focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5); /* Blue shadow for focus state */
+}
+
+/* File input fields */
+.registration-form-container input[type="file"] {
+    border: 1px solid #d1d5db; /* Light border for file inputs */
+    padding: 0.5rem; /* Less padding */
+    background: #f9f9f9; /* Light background */
+    border-radius: 6px; /* Rounded corners */
+    transition: border-color 0.3s ease; /* Smooth border color transition */
+}
+
+.registration-form-container input[type="file"]:focus {
+    border-color: #007bff; /* Blue border on focus for file inputs */
+    background: #ffffff; /* White background on focus */
+}
+
+/* Submit button */
+.registration-form-container button {
+    background-color: #007bff; /* Blue background */
+    color: #ffffff; /* White text */
+    font-size: 1.125rem; /* Slightly larger font size for better readability */
+    font-weight: 600; /* Semi-bold text */
+    padding: 0.875rem 1.5rem; /* Increased padding for a more prominent button */
+    border: none; /* No border */
+    border-radius: 6px; /* Slightly more rounded corners for a modern look */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth transition for all state changes */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for a lifted effect */
+    text-transform: uppercase; /* Uppercase text for emphasis */
+}
+
+/* Hover state for submit button */
+.registration-form-container button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Darker shadow on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Focus state for submit button */
+.registration-form-container button:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.4); /* Blue outline for focus state */
+}

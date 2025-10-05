@@ -1,0 +1,79 @@
+.footer {
+    background-color: #005da3; /* Matches navbar color */
+    color: #fff;
+    padding: 20px 0;
+    font-family: sans-serif;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .footer-logo {
+    height: 50px;
+    margin: 0 10px;
+  }
+  
+  hr {
+    border: 1px solid #fff;
+    margin: 20px 0;
+  }
+  
+  .footer-info {
+    padding-top: 10px;
+  }
+  
+  /* Align logos horizontally in a single line without wrapping */
+  .logo-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Add horizontal scrolling if logos overflow */
+  }
+  
+  .footer-logo {
+    height: 70px;
+    margin: 0 15px; /* Add spacing between logos */
+  }
+  
+  .text-left {
+    text-align: left;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+  
+  .text-right {
+    text-align: right;
+  }
+  
+  p {
+    margin: 5px 0;
+  }
+  
+  /* Responsive footer layout for smaller screens */
+  @media (max-width: 768px) {
+    .footer-info {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .text-left, .text-right {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+  
+    .logo-row {
+      flex-wrap: wrap; /* Stack logos vertically on very small screens */
+    }
+  }

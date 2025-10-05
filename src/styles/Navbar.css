@@ -1,0 +1,155 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #005da3;
+    padding: 0 30px;
+    height: 70px; /* Keep the navbar height fixed */
+    position: relative; /* Allows elements to be positioned relative to the navbar */
+    z-index: 1;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.navbar-logo img {
+    height: 70px; /* Make the logo taller to overlap the navbar */
+    margin: -25px 0 0 -30px;
+    position: absolute;
+    top: -10px; /* Adjusts the position of the logo to overlap */
+    left: 0;
+}
+
+.navbar-logo h1 {
+    color: white;
+    font-size: 24px;
+    margin: 0 0 0 110px; /* Adjust the app name position to account for the larger logo */
+}
+
+.navbar-links {
+    display: flex;
+    gap: 30px; /* Increase the spacing between links for a cleaner look */
+}
+
+.navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px; /* Increase font size for better visibility */
+    /* padding: 10px 20px; Add padding for more clickable area and balance */
+    border-radius: 5px; /* Smooth corners for modern touch */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
+    position: relative;
+}
+
+.navbar-links a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background-color: white; /* Underline effect color */
+    transition: width 0.3s ease, left 0.3s ease; /* Smooth underline transition */
+}
+
+.navbar-links a:hover::after {
+    width: 100%; /* Expand the underline on hover */
+    left: 0; /* Start the underline from the left */
+}
+
+.navbar-links a:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Light background on hover */
+    transform: translateY(-2px); /* Subtle lift effect on hover */
+}
+
+/* Dropdown menu */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    color: white;
+    font-size: 18px; /* Slightly larger for readability */
+    text-decoration: none;
+    padding: 10px 0; /* Increase padding for more clickable area */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+    color: rgba(255, 255, 255, 0.8); /* Subtle fade effect on hover */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: calc(100% + 5px); /* Ensure it's directly below with slight spacing */
+    left: 0; /* Align with the toggle */
+    width: 700px; /* Width for the dropdown content */
+    padding: 20px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15); /* Enhanced shadow for modern feel */
+    z-index: 100;
+    border-radius: 8px; /* More rounded corners for modern look */
+    opacity: 0; /* Start invisible */
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    transform: translateY(-10px); /* Dropdown slides in from above */
+}
+
+/* Make dropdown appear on hover */
+.dropdown:hover .dropdown-content {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0); /* Smooth slide effect */
+}
+
+/* Style for each section/column in the dropdown */
+.dropdown-section {
+    flex: 1;
+    padding: 10px;
+}
+
+.dropdown-section h4 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #005da3;
+    font-weight: bold;
+}
+
+.dropdown-section a {
+    display: block;
+    padding: 8px 0;
+    color: black;
+    text-decoration: none;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    font-size: 16px;
+}
+
+.dropdown-section a:hover {
+    color: white;
+    background-color: #005da3; /* Background on hover for better visibility */
+    border-radius: 5px;
+}
+
+.navbar-flag img {
+    height: 40px;
+}
+
+.navbar-online-services {
+    background-color: #d50032;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar-online-services:hover {
+    background-color: #b0002a;
+}

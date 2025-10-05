@@ -1,0 +1,210 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f1f1f1;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-box {
+  background-color: white;
+  padding: 30px; /* Increased padding for better spacing */
+  border-radius: 20px; /* More curved borders */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow for a subtle 3D effect */
+  width: 450px; /* Increased width for a larger box */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px; /* Increased margin for more spacing below the heading */
+  font-size: 32px; /* Increased font size for a more prominent heading */
+  font-weight: bold; /* Bold text for emphasis */
+  color: #333; /* Darker color for better readability */
+  text-transform: uppercase; /* Converts text to uppercase for a stronger impact */
+}
+.captcha-group {
+  margin: 30px 0; /* Spacing around the CAPTCHA group */
+  text-align: center; /* Center the CAPTCHA group */
+}
+
+.captcha-group label {
+  display: block;
+  font-size: 18px; /* Larger font size for the label */
+  margin-bottom: 10px; /* Space below the label */
+  color: #333; /* Dark color for better readability */
+}
+
+.captcha-box {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Center the CAPTCHA value and button horizontally */
+  align-items: center; /* Center the CAPTCHA value and button vertically */
+  gap: 60px; /* Space between CAPTCHA value and button */
+  margin: 0 0 0 10px; /* Space above the CAPTCHA box */
+}
+
+.captcha-value {
+  font-size: 24px; /* Larger font size for CAPTCHA */
+  font-weight: bold;
+  background-color: #e0e0e0; /* Subtle background for better contrast */
+  padding: 16px 24px; /* Increased padding for a larger CAPTCHA */
+  border-radius: 8px; /* Rounded corners */
+  border: 2px solid #ccc; /* Light border */
+  color: #333; /* Dark text color */
+}
+
+.refresh-captcha {
+  background-color: #007bff; /* Blue color for the button */
+  color: white; /* White text */
+  border: none;
+  cursor: pointer;
+  margin: 0px 0px 0 -50px;
+  font-size: 20px; /* Larger font size for the button */
+  padding: 12px 16px; /* Adequate padding */
+  border-radius: 8px; /* Rounded corners */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+.refresh-captcha:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.refresh-captcha:active {
+  transform: scale(0.95); /* Slight scale-down effect on click */
+}
+
+.input-group {
+  margin-bottom: 20px; /* Increased bottom margin for more spacing between fields */
+  text-align: center; /* Centers the content */
+}
+
+.input-group label {
+  font-size: 18px; /* Increased font size for better visibility */
+  font-weight: 600; /* Slightly bold for emphasis */
+  color: #555; /* Soft dark color for readability */
+  text-transform: capitalize; /* Capitalize first letter for a clean look */
+  margin-bottom: 10px; /* Adds some spacing below the label */
+}
+
+.input-group input {
+  width: 100%; /* Ensures the input takes full width of the container */
+  padding: 12px; /* Adds padding for a more comfortable input field */
+  font-size: 16px; /* Larger text inside the input field */
+  border: 2px solid #ccc; /* Thicker border for better distinction */
+  border-radius: 6px; /* Slightly more curved corners for a modern look */
+  text-align: left; /* Aligns text inside the input field to the left */
+  color: #333; /* Dark color for the input text */
+  background-color: #f9f9f9; /* Light background for a clean look */
+  transition: border-color 0.3s ease; /* Smooth transition for the border when focused */
+}
+
+.input-group input:focus {
+  border-color: #007bff; /* Changes the border color when the input is focused */
+  outline: none; /* Removes the default outline */
+}
+
+
+.captcha-group {
+  margin-bottom: 30px; /* Increased margin-bottom for better separation from other elements */
+  text-align: center; /* Centers the entire CAPTCHA group */
+}
+
+.captcha-box {
+  display: inline-flex; /* Ensures the box is horizontally aligned */
+  justify-content: center; /* Centers the captcha box horizontally */
+  align-items: center;
+  margin: 20px 0; /* Added margin-top and margin-bottom for spacing around the CAPTCHA box */
+}
+
+.captcha-value {
+  font-size: 24px; /* Increased font size for CAPTCHA for better readability */
+  font-weight: bold;
+  background-color: #e0e0e0; /* Subtle background for better contrast */
+  padding: 16px 20px; /* Increased padding to make the CAPTCHA larger */
+  margin-right: 15px; /* Space between CAPTCHA value and refresh button */
+  border-radius: 8px; /* Slightly larger border-radius for a modern look */
+  border: 2px solid #ccc; /* Border to give it more distinction */
+}
+
+.refresh-captcha {
+  background-color: #007bff; /* Blue color to make the button stand out */
+  color: white; /* White text for better contrast */
+  border: none;
+  cursor: pointer;
+  font-size: 18px; /* Increased font size for better visibility */
+  padding: 12px 16px; /* Increased padding for a larger button */
+  border-radius: 6px; /* Slight rounding for a clean button look */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.refresh-captcha:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.captcha-input {
+  width: calc(100% - 32px); /* Adjusted width considering padding and margins */
+  padding: 14px; /* Increased padding for better size */
+  font-size: 18px; /* Larger text inside the input field */
+  border: 2px solid #ccc; /* Thicker border for a distinct input box */
+  border-radius: 6px; /* Rounded corners for modern look */
+  margin: 20px 0 0; /* Margin-top for spacing from CAPTCHA box and margin-bottom for spacing before the next element */
+  color: #333;
+  background-color: #f9f9f9;
+  text-align: center; /* Center the text inside input */
+  transition: border-color 0.3s ease; /* Smooth transition for focus effect */
+}
+/* Container for the CAPTCHA input field */
+.captcha-input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0; /* Spacing around the container */
+}
+
+#captcha {
+  width: 50%; /* Full-width input */
+  max-width: 400px; /* Limit the maximum width */
+  padding: 12px 16px; /* Add padding for better size and comfort */
+  font-size: 16px; /* Readable font size */
+  border: 1px solid #ccc; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #f9f9f9; /* Light background for better contrast */
+  color: #333; /* Dark text color for readability */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for focus effects */
+  text-align: center; /* Center the text inside input */
+  margin: 0 0px 0 16px;
+}
+
+#captcha::placeholder {
+  color: #aaa; /* Light color for placeholder text */
+  opacity: 1; /* Ensure placeholder text is visible */
+}
+
+#captcha:focus {
+  border-color: #007bff; /* Blue border on focus */
+  outline: none; /* Remove default focus outline */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Enhanced shadow on focus */
+}
+
+.captcha-input:focus {
+  border-color: #007bff; /* Blue border when focused */
+  outline: none; /* Removes default focus outline */
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px; /* Slightly increased padding for the button */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 10px; /* Increased border radius for the button */
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
