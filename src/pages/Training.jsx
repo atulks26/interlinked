@@ -6,7 +6,7 @@ const videoData = {
         {
             title: "Seminar 1",
             thumbnail:
-                "https://thedigitalprojectmanager.com/wp-content/uploads/2024/01/project-management-symposium.png",
+                "https://tse2.mm.bing.net/th/id/OIP.b83x3HXh43XJ5c8uoW8aGQHaE8?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3",
             link: "#",
         },
         {
@@ -66,7 +66,7 @@ const videoData = {
         {
             title: "Workshop 1",
             thumbnail:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9B49FzbFGBuMNtpy8QqrbJAvqETbF1XRnJQ&s",
+                "https://cdn.eventespresso.com/wp-content/uploads/2023/08/01074844/Workshop-Ideas-Image-Man-2048x1152.jpg",
             link: "#",
         },
         {
@@ -98,7 +98,7 @@ const videoData = {
         {
             title: "Live Session 1",
             thumbnail:
-                "https://amrutkerala.org/wp-content/uploads/2020/12/CAPACITY-BUILDING-1024x506.png",
+                "https://tse1.mm.bing.net/th/id/OIP.-2Uzxb0IX_FwP1LObVMywQHaFj?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3,
             link: "#",
         },
         {
