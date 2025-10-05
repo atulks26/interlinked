@@ -1,15 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 
 const GoogleMapComponent = () => {
-    const mapRef = useRef(null); // Reference for the map div
+    const mapRef = useRef(null);
     const [map, setMap] = useState(null);
     const [apiLoaded, setApiLoaded] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Dynamically load Google Maps script
     useEffect(() => {
         const loadGoogleMaps = () => {
-            // If already loaded, don't reload the script
             if (
                 window.google &&
                 window.google.maps &&
@@ -20,7 +18,7 @@ const GoogleMapComponent = () => {
             } else {
                 const script = document.createElement("script");
                 script.src =
-                    "https://maps.googleapis.com/maps/api/js?key=AIzaSyDXn0sLaBXyVkJhbT568JTeJJO81N7sW48&libraries=places";
+                    `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAP_API}&libraries=places`;
                 script.async = true;
                 script.onload = () => {
                     setApiLoaded(true);
@@ -33,7 +31,6 @@ const GoogleMapComponent = () => {
         loadGoogleMaps();
     }, []);
 
-    // Initialize map once the script is loaded
     const initMap = () => {
         if (window.google) {
             const infoWindow = new window.google.maps.InfoWindow();
@@ -158,15 +155,13 @@ const GoogleMapComponent = () => {
         }
     };
 
-    // Search for places when the user clicks the search button
-
     const findPlaces = (query) => {
         if (!map || !window.google || !window.google.maps.places || !query) {
             console.log("Map error");
             return;
         }
 
-        const service = new window.google.maps.places.PlacesService(map); // Ensure places library is available
+        const service = new window.google.maps.places.PlacesService(map);
         const request = {
             query: query,
             fields: ["name", "geometry", "business_status"],
@@ -174,7 +169,6 @@ const GoogleMapComponent = () => {
                 radius: 5000,
                 center: { lat: 28.5991277, lng: 77.120252 },
             },
-            // openNow: true,
         };
 
         service.textSearch(request, (results, status) => {
@@ -203,22 +197,16 @@ const GoogleMapComponent = () => {
         });
     };
 
-    // Handle user input change
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
     };
 
-    // Handle search button click
     const handleSearch = () => {
         findPlaces(searchQuery);
     };
 
     return (
         <div className="relative flex justify-center ">
-            {/* <button className="absolute right-2 top-16 z-10 bg-red-200 px-4 py-2 opacity-90 border-2 border-red-400">
-                Clear Selection
-            </button> */}
-
             <div
                 style={{
                     position: "relative",
