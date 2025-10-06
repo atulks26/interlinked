@@ -110,7 +110,7 @@ const videoData = {
         {
             title: "Live Session 3",
             thumbnail:
-                "https://media.licdn.com/dms/image/v2/D5612AQHwy4vuHq3Xow/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1712235873353?e=2147483647&v=beta&t=ubbZQ_NSytFkSlrUVJCwqj0uttyRPieWW1ItgLnuVs8",
+                "https://gauravtiwari.org/wp-content/uploads/2020/06/working-seminar.jpg?fit=1160%2C773&ssl=1",
             link: "#",
         },
         {
