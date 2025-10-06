@@ -98,7 +98,7 @@ const videoData = {
         {
             title: "Live Session 1",
             thumbnail:
-                "https://tse1.mm.bing.net/th/id/OIP.-2Uzxb0IX_FwP1LObVMywQHaFj?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3,
+                "https://tse1.mm.bing.net/th/id/OIP.-2Uzxb0IX_FwP1LObVMywQHaFj?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3",
             link: "#",
         },
         {
