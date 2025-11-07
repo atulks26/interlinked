@@ -1,155 +1,279 @@
+/* --- Base Navbar Styles --- */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #005da3;
-    padding: 0 30px;
-    height: 70px; /* Keep the navbar height fixed */
-    position: relative; /* Allows elements to be positioned relative to the navbar */
-    z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #005da3, #0074d9);
+  padding: 0 30px;
+  height: 70px;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
 }
 
 .navbar-logo {
-    display: flex;
-    align-items: center;
-    position: relative;
-    z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .navbar-logo img {
-    height: 70px; /* Make the logo taller to overlap the navbar */
-    margin: -25px 0 0 -30px;
-    position: absolute;
-    top: -10px; /* Adjusts the position of the logo to overlap */
-    left: 0;
+  height: 48px;
+  width: auto;
 }
 
-.navbar-logo h1 {
-    color: white;
-    font-size: 24px;
-    margin: 0 0 0 110px; /* Adjust the app name position to account for the larger logo */
+.logo-clickable {
+  cursor: pointer;
+  height: 55px;
+  width: auto;
+  transition: transform 0.2s ease;
 }
 
+.logo-clickable:hover {
+  transform: scale(1.05);
+}
+
+/* --- Nav Links --- */
 .navbar-links {
-    display: flex;
-    gap: 30px; /* Increase the spacing between links for a cleaner look */
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  position: relative;
+  z-index: 1100;
 }
 
-.navbar-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 20px; /* Increase font size for better visibility */
-    /* padding: 10px 20px; Add padding for more clickable area and balance */
-    border-radius: 5px; /* Smooth corners for modern touch */
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
-    position: relative;
-}
-
-.navbar-links a::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 3px;
-    background-color: white; /* Underline effect color */
-    transition: width 0.3s ease, left 0.3s ease; /* Smooth underline transition */
-}
-
-.navbar-links a:hover::after {
-    width: 100%; /* Expand the underline on hover */
-    left: 0; /* Start the underline from the left */
-}
-
-.navbar-links a:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Light background on hover */
-    transform: translateY(-2px); /* Subtle lift effect on hover */
-}
-
-/* Dropdown menu */
-.dropdown {
-    position: relative;
-}
-
+.navbar-links a,
 .dropdown-toggle {
-    color: white;
-    font-size: 18px; /* Slightly larger for readability */
-    text-decoration: none;
-    padding: 10px 0; /* Increase padding for more clickable area */
-    cursor: pointer;
-    transition: color 0.3s ease;
+  color: #fff;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 500;
+  position: relative;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
+.navbar-links a:hover,
 .dropdown-toggle:hover {
-    color: rgba(255, 255, 255, 0.8); /* Subtle fade effect on hover */
+  color: #ffd700;
+}
+
+/* Underline animation */
+.navbar-links a::after,
+.dropdown-toggle::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #ffd700;
+  transition: all 0.3s ease;
+}
+
+.navbar-links a:hover::after,
+.dropdown-toggle:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* --- Dropdown Menu (Mega Menu) --- */
+.dropdown {
+  position: relative;
+  z-index: 1200;
 }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    top: calc(100% + 5px); /* Ensure it's directly below with slight spacing */
-    left: 0; /* Align with the toggle */
-    width: 700px; /* Width for the dropdown content */
-    padding: 20px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15); /* Enhanced shadow for modern feel */
-    z-index: 100;
-    border-radius: 8px; /* More rounded corners for modern look */
-    opacity: 0; /* Start invisible */
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-    transform: translateY(-10px); /* Dropdown slides in from above */
+  display: none;
+  position: absolute;
+  background: rgba(255, 255, 255, 0.98);
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 750px;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  padding: 25px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.35s ease;
+  backdrop-filter: blur(10px);
 }
 
-/* Make dropdown appear on hover */
 .dropdown:hover .dropdown-content {
-    display: flex;
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0); /* Smooth slide effect */
+  display: flex;
+  opacity: 1;
+  visibility: visible;
 }
 
-/* Style for each section/column in the dropdown */
 .dropdown-section {
-    flex: 1;
-    padding: 10px;
-}
-
-.dropdown-section h4 {
-    margin-bottom: 10px;
-    font-size: 16px;
-    color: #005da3;
-    font-weight: bold;
+  flex: 1;
+  padding: 0 12px;
 }
 
 .dropdown-section a {
-    display: block;
-    padding: 8px 0;
-    color: black;
-    text-decoration: none;
-    transition: color 0.3s ease, background-color 0.3s ease;
-    font-size: 16px;
+  display: block;
+  padding: 8px 12px;
+  font-size: 15px;
+  color: #222;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .dropdown-section a:hover {
-    color: white;
-    background-color: #005da3; /* Background on hover for better visibility */
-    border-radius: 5px;
+  background-color: #005da3;
+  color: #fff;
+  transform: translateX(5px);
 }
 
-.navbar-flag img {
-    height: 40px;
-}
-
+/* --- CTA Button (Log In) --- */
 .navbar-online-services {
-    background-color: #d50032;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
+  background: #d50032;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
 }
 
 .navbar-online-services:hover {
-    background-color: #b0002a;
+  background-color: #b0002a;
+  transform: scale(1.05);
+}
+
+/* --- Hamburger Menu --- */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Hamburger active (cross animation) */
+.hamburger.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 992px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: rgba(0, 93, 163, 0.98);
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    padding: 25px 20px;
+    gap: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    animation: slideDown 0.35s ease forwards;
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-15%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .navbar-links a,
+  .dropdown-toggle {
+    width: 100%;
+    font-size: 18px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  /* Mobile Dropdown (open on click) */
+  .dropdown-content {
+    display: none;
+    position: static;
+    background-color: rgba(255, 255, 255, 0.1);
+    width: 100%;
+    padding: 10px 0;
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .dropdown.mobile-open .dropdown-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dropdown-section a {
+    color: #f1f1f1;
+    padding: 10px 20px;
+  }
+
+  .dropdown-section a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  /* ✅ Log In Button inside responsive menu */
+  .navbar-online-services {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 18px;
+    display: none;
+  }
+
+  .navbar-links.active .navbar-online-services {
+    display: block;
+  }
+}
+
+/* --- Smooth Shadow on Scroll --- */
+@media (min-width: 768px) {
+  .navbar.scrolled {
+    background: rgba(0, 93, 163, 0.95);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+  }
 }
