@@ -30,6 +30,11 @@ const projectsData = [
         name: "Project D",
         status: "completed",
     },
+    {
+        id: 4,
+        name: "Project E",
+        status: "completed",
+    },
 ];
 
 const ProjectsPage = () => {
