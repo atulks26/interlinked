@@ -8,19 +8,6 @@ import {
 } from "react-icons/fa";
 import AdminSidebar from "../components/Sidebar";
 
-const departments = [
-  "Architecture Department",
-  "Advertisement",
-  "Assessment and Collection Department",
-  "Ayush Department",
-  "Building Department",
-  "Central Establishment",
-  "Community Services",
-  "Engineering Department",
-  "Public Health Department",
-  "Finance Department",
-];
-
 const channels = ["#general", "#projects", "#announcements", "#updates"];
 const users = ["Ankur", "Sanchita", "Priyanshu", "Atul", "Ritika", "Rahul", "Pooja"];
 const messagesPool = [
@@ -31,14 +18,14 @@ const messagesPool = [
   "Meeting scheduled for 3 PM.",
 ];
 
-const generateMessages = (dept, channel) => {
+const generateMessages = (channel) => {
   const msgCount = Math.floor(Math.random() * 5) + 5;
   return Array.from({ length: msgCount }, (_, i) => {
     const user = users[Math.floor(Math.random() * users.length)];
     return {
-      id: `${dept}-${channel}-${i}`,
+      id: `${channel}-${i}`,
       department: user,
-      avatar: `https://i.pravatar.cc/40?u=${dept}-${i}`,
+      avatar: `https://i.pravatar.cc/40?u=${channel}-${i}`,
       message: messagesPool[Math.floor(Math.random() * messagesPool.length)],
       time: new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toLocaleTimeString([], {
         hour: "2-digit",
@@ -49,10 +36,9 @@ const generateMessages = (dept, channel) => {
   });
 };
 
-const InterDepartmentForum = ({ user, handleLogout }) => {
-  const [selectedDept, setSelectedDept] = useState(departments[0]);
+const IntraDepartmentForum = ({ user, handleLogout }) => {
   const [selectedChannel, setSelectedChannel] = useState(channels[0]);
-  const [messages, setMessages] = useState(generateMessages(departments[0], channels[0]));
+  const [messages, setMessages] = useState(generateMessages(channels[0]));
   const [newMessage, setNewMessage] = useState("");
   const [replyIndex, setReplyIndex] = useState(null);
   const [replyText, setReplyText] = useState("");
@@ -61,8 +47,8 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
   const chatEndRef = useRef(null);
 
   useEffect(() => {
-    setMessages(generateMessages(selectedDept, selectedChannel));
-  }, [selectedDept, selectedChannel]);
+    setMessages(generateMessages(selectedChannel));
+  }, [selectedChannel]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -113,7 +99,7 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
         />
       </div>
 
-      {/* LEFT OVERLAY (mobile close on outside click) */}
+      {/* LEFT OVERLAY */}
       {leftSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
@@ -133,7 +119,7 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
               <FaBars />
             </button>
             <h1 className="text-3xl font-bold text-gray-800">
-              Inter-Department Forum
+              Intra-Department Forum
             </h1>
           </div>
 
@@ -148,7 +134,7 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
         {/* CHAT HEADER */}
         <div className="bg-white p-4 rounded-lg shadow mb-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-800">
-            {selectedDept} {selectedChannel}
+            {user?.department} {selectedChannel}
           </h2>
           <span className="text-gray-500 text-sm">
             {messages.length} messages
@@ -218,7 +204,7 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
           <input
             type="text"
             className="flex-1 border rounded px-4 py-2 focus:outline-blue-400"
-            placeholder={`Message ${selectedDept}...`}
+            placeholder={`Message ${selectedChannel}...`}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
@@ -238,32 +224,13 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
           ${rightSidebarOpen ? "translate-x-0" : "translate-x-full"} md:translate-x-0 w-72`}
       >
         <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-          <h2 className="text-xl font-bold text-gray-800">Departments</h2>
+          <h2 className="text-xl font-bold text-gray-800">Channels</h2>
           <button className="md:hidden" onClick={() => setRightSidebarOpen(false)}>
             <FaChevronRight />
           </button>
         </div>
 
         <div className="p-4 overflow-y-auto h-[calc(100%-64px)]">
-          <h3 className="font-semibold mb-2 text-gray-700">Departments</h3>
-          <ul className="space-y-2 mb-4">
-            {departments.map((dept) => (
-              <li
-                key={dept}
-                onClick={() => {
-                  setSelectedDept(dept);
-                  setRightSidebarOpen(false);
-                }}
-                className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-blue-100 ${
-                  selectedDept === dept ? "bg-blue-200 font-semibold" : "text-gray-700"
-                }`}
-              >
-                <FaHashtag /> {dept}
-              </li>
-            ))}
-          </ul>
-
-          <h3 className="font-semibold mb-2 text-gray-700">Channels</h3>
           <ul className="space-y-2">
             {channels.map((ch) => (
               <li
@@ -276,7 +243,7 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
                   selectedChannel === ch ? "bg-blue-200 font-semibold" : "text-gray-700"
                 }`}
               >
-                {ch}
+                <FaHashtag /> {ch}
               </li>
             ))}
           </ul>
@@ -294,4 +261,4 @@ const InterDepartmentForum = ({ user, handleLogout }) => {
   );
 };
 
-export default InterDepartmentForum;
+export default IntraDepartmentForum;

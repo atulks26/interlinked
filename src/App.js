@@ -12,7 +12,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import Department from "./pages/Department";
 import Training from "./pages/Training";
-import DepartmentForum from "./components/DepartmentForum"; // Import DepartmentForum
+import DepartmentForum from "./components/DepartmentForum"; // Intra-Department Forum
 import RegistrationForm from "./pages/Register";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import InterDepartmentForum from "./components/InterDepartmentForum";
@@ -23,7 +23,22 @@ import OngoingStatusPage from "./components/OngoingStatusPage";
 import ProjectForm from './pages/ProjectForm';
 import ChatBotIframe from "./components/cahtbot";
 
+// Import ManageJunior
+import ManageJunior from "./pages/ManageJunior";
+import DepartmentTasksPage from "./pages/DepartmentTasksPage";
+
 function App() {
+    // Temporary simulated user (replace later with real logged-in data)
+    const user = {
+        userId: "admin123",
+        user_name: "Ankur Sharma",
+        department: "engineering",
+    };
+
+    const handleLogout = () => {
+        alert("You have been logged out.");
+    };
+
     return (
         <div>
             <Router>
@@ -36,41 +51,48 @@ function App() {
                         element={<AdminDashboard />}
                     />
                     <Route
+                        path="/dashboard/admin/:department/:id/officers"
+                        element={<ManageJunior />}
+                    />
+                    <Route
                         path="/dashboard/junior-officer/:department/:id"
                         element={<EmployeeDashboard />}
                     />
                     <Route
-                        path="/department/:department"
-                        element={<Department />}
+                        path="/dashboard/:department/tasks"
+                        element={<DepartmentTasksPage />}
                     />
                     <Route path="/projects" element={<Projects />} />
                     <Route path="/training" element={<Training />} />
                     <Route path="/forum" element={<Forum />} />
-                    <Route path="/projectspage" element={<ProjectsPage/>}/>
-                    <Route path="/statuspage" element={<StatusPage/>}/>
+                    <Route path="/projectspage" element={<ProjectsPage />} />
+                    <Route path="/statuspage" element={<StatusPage />} />
                     <Route path="/forum/topic/:id" element={<TopicDetail />} />
-                    {/* Department forum route */}
                     <Route path="/register" element={<RegistrationForm />} />
 
+                    {/* ✅ Intra-Department Forum */}
                     <Route
                         path="/dashboard/:department/department-forum"
                         element={<DepartmentForum />}
                     />
+
+                    {/* ✅ Inter-Department Forum */}
+                    <Route
+                        path="/inter-department-forum"
+                        element={<InterDepartmentForum user={user} handleLogout={handleLogout} />}
+                    />
+
                     <Route
                         path="/statuspage"
                         element={<OngoingStatusPage />}
                     />
-                    <Route
-                        path="/inter-department-forum"
-                        element={<InterDepartmentForum />}
-                    />
-                    <Route path="/project-form" element={<ProjectForm />} /> 
+                    <Route path="/project-form" element={<ProjectForm />} />
                     <Route
                         path="/dashboard/junior-officer/:department/:id/profile"
                         element={<EmployeeProfile />}
                     />
                 </Routes>
-                <ChatBotIframe/>
+                <ChatBotIframe />
                 <Footer />
             </Router>
         </div>
