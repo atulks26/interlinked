@@ -6,6 +6,7 @@ const GoogleMapComponent = () => {
   const [apiLoaded, setApiLoaded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Load Google Maps API
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (window.google && window.google.maps && window.google.maps.places) {
@@ -26,293 +27,353 @@ const GoogleMapComponent = () => {
     loadGoogleMaps();
   }, []);
 
-  const initMap = () => {
-    if (window.google) {
-      const infoWindow = new window.google.maps.InfoWindow();
-
-      const center = { lat: 28.6139, lng: 77.209 };
-      const newMap = new window.google.maps.Map(mapRef.current, {
-        center: center,
-        zoom: 11.5,
-        mapId: "DELHI_MAP_ID",
-      });
-      setMap(newMap);
-
-      // ---------------------
-      // ✅ GREEN PROJECTS (Public Works, Health, Water)
-      // ---------------------
-      const greenPolygons = [
-        {
-          projectCoordinates: [
-            { lat: 28.630989, lng: 77.082103 },
-            { lat: 28.635966, lng: 77.096779 },
-            { lat: 28.625353, lng: 77.101282 },
-            { lat: 28.622628, lng: 77.094719 },
-            { lat: 28.622006, lng: 77.087798 },
-            { lat: 28.630989, lng: 77.082103 },
-          ],
-          message: "Water pipeline maintenance in Janakpuri. Dept: Water",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.599519, lng: 77.029954 },
-            { lat: 28.595043, lng: 77.036569 },
-            { lat: 28.597298, lng: 77.03848 },
-            { lat: 28.595556, lng: 77.041078 },
-            { lat: 28.597932, lng: 77.043099 },
-            { lat: 28.606257, lng: 77.035586 },
-            { lat: 28.599519, lng: 77.029954 },
-          ],
-          message: "Road renovation in Dwarka Sec-13. Dept: Roadways",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.621001, lng: 77.063501 },
-            { lat: 28.617719, lng: 77.06055 },
-            { lat: 28.614471, lng: 77.067496 },
-            { lat: 28.618513, lng: 77.068873 },
-            { lat: 28.621001, lng: 77.063501 },
-          ],
-          message: "Health camp for BPL citizens. Dept: Health",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.7041, lng: 77.1025 },
-            { lat: 28.7081, lng: 77.1105 },
-            { lat: 28.7031, lng: 77.1185 },
-            { lat: 28.6991, lng: 77.1125 },
-          ],
-          message: "Tree plantation in Rohini Sec-11. Dept: Environment",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.6462, lng: 77.2204 },
-            { lat: 28.6492, lng: 77.2264 },
-            { lat: 28.6442, lng: 77.2304 },
-            { lat: 28.6412, lng: 77.2244 },
-          ],
-          message: "Footpath improvement near Connaught Place. Dept: PWD",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.6771, lng: 77.2214 },
-            { lat: 28.6801, lng: 77.2264 },
-            { lat: 28.6751, lng: 77.2304 },
-            { lat: 28.6721, lng: 77.2264 },
-          ],
-          message: "Public park redevelopment in Civil Lines. Dept: NDMC",
-        },
-      ];
-
-      // ---------------------
-      // 🔴 RED PROJECTS (Construction, Power, Drainage)
-      // ---------------------
-      const redPolygons = [
-        {
-          projectCoordinates: [
-            { lat: 28.62346, lng: 77.061881 },
-            { lat: 28.627869, lng: 77.059532 },
-            { lat: 28.633486, lng: 77.056595 },
-            { lat: 28.624064, lng: 77.046874 },
-            { lat: 28.62346, lng: 77.061881 },
-          ],
-          message: "Building & electrical work in Uttam Nagar. Dept: E&M",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.6531, lng: 77.302 },
-            { lat: 28.6571, lng: 77.308 },
-            { lat: 28.6521, lng: 77.312 },
-            { lat: 28.6481, lng: 77.306 },
-          ],
-          message: "Drain repair in Laxmi Nagar. Dept: DJB",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.6291, lng: 77.212 },
-            { lat: 28.6321, lng: 77.218 },
-            { lat: 28.6271, lng: 77.221 },
-            { lat: 28.6241, lng: 77.216 },
-          ],
-          message: "Power line upgrade in Karol Bagh. Dept: Electricity",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.5441, lng: 77.2405 },
-            { lat: 28.5481, lng: 77.2465 },
-            { lat: 28.5431, lng: 77.2505 },
-            { lat: 28.5391, lng: 77.2445 },
-          ],
-          message: "Metro expansion near Saket. Dept: DMRC",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.6941, lng: 77.1605 },
-            { lat: 28.6981, lng: 77.1655 },
-            { lat: 28.6921, lng: 77.1705 },
-            { lat: 28.6881, lng: 77.1655 },
-          ],
-          message: "Sewage work in Pitampura. Dept: Water & Sanitation",
-        },
-      ];
-
-      // ---------------------
-      // 🟣 BLUE PROJECTS (Smart City, Digital Infra, Lighting)
-      // ---------------------
-      const bluePolygons = [
-        {
-          projectCoordinates: [
-            { lat: 28.5601, lng: 77.185 },
-            { lat: 28.5641, lng: 77.191 },
-            { lat: 28.5581, lng: 77.195 },
-            { lat: 28.5541, lng: 77.189 },
-          ],
-          message: "Smart lighting installation in Vasant Vihar. Dept: NDMC",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.7131, lng: 77.284 },
-            { lat: 28.7171, lng: 77.289 },
-            { lat: 28.7111, lng: 77.293 },
-            { lat: 28.7071, lng: 77.288 },
-          ],
-          message: "Public WiFi setup in Yamuna Vihar. Dept: Smart City",
-        },
-        {
-          projectCoordinates: [
-            { lat: 28.5891, lng: 77.315 },
-            { lat: 28.5931, lng: 77.321 },
-            { lat: 28.5871, lng: 77.325 },
-            { lat: 28.5831, lng: 77.319 },
-          ],
-          message: "Digital kiosk setup in Mayur Vihar. Dept: IT & Tech",
-        },
-      ];
-
-      const addPolygons = (polygonList, color) => {
-        polygonList.forEach((polygonData) => {
-          const polygon = new window.google.maps.Polygon({
-            paths: polygonData.projectCoordinates,
-            strokeColor: color,
-            strokeOpacity: 1.0,
-            strokeWeight: 3,
-            fillColor: color,
-            fillOpacity: 0.35,
-          });
-
-          polygon.setMap(newMap);
-
-          polygon.addListener("mouseover", (event) => {
-            infoWindow.setContent(polygonData.message);
-            infoWindow.setPosition(event.latLng);
-            infoWindow.open(newMap);
-          });
-
-          polygon.addListener("mouseout", () => infoWindow.close());
-        });
-      };
-
-      addPolygons(greenPolygons, "#3FC047");
-      addPolygons(redPolygons, "#FF0000");
-      addPolygons(bluePolygons, "#0077FF");
-    }
+  // Expand coordinates slightly to prevent exact overlap
+  const expandCoords = (coords, expandFactor = 0.0015) => {
+    return coords.map((c) => ({
+      lat: c.lat + (Math.random() - 0.5) * expandFactor,
+      lng: c.lng + (Math.random() - 0.5) * expandFactor,
+    }));
   };
 
+  // Initialize map and polygons
+  const initMap = () => {
+    if (!window.google) return;
+
+    const center = { lat: 28.6139, lng: 77.209 };
+    const newMap = new window.google.maps.Map(mapRef.current, {
+      center,
+      zoom: 11,
+    });
+    setMap(newMap);
+
+    const infoWindow = new window.google.maps.InfoWindow();
+
+    const addPolygons = (polygonList, color) => {
+      polygonList.forEach((polygonData) => {
+        const polygon = new window.google.maps.Polygon({
+          paths: expandCoords(polygonData.projectCoordinates),
+          strokeColor: color,
+          strokeOpacity: 0.9,
+          strokeWeight: 3,
+          fillColor: color,
+          fillOpacity: 0.4,
+        });
+
+        polygon.setMap(newMap);
+
+        polygon.addListener("mouseover", (event) => {
+          infoWindow.setContent(polygonData.message);
+          infoWindow.setPosition(event.latLng);
+          infoWindow.open(newMap);
+        });
+        polygon.addListener("mouseout", () => infoWindow.close());
+      });
+    };
+
+    // Polygons: Green
+    const greenPolygons = [
+      {
+        projectCoordinates: [
+          { lat: 28.630989, lng: 77.082103 },
+          { lat: 28.635966, lng: 77.096779 },
+          { lat: 28.625353, lng: 77.101282 },
+          { lat: 28.622628, lng: 77.094719 },
+        ],
+        message: "Water pipeline maintenance in Janakpuri. Dept: Water",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.595043, lng: 77.036569 },
+          { lat: 28.607298, lng: 77.04348 },
+          { lat: 28.599932, lng: 77.053099 },
+          { lat: 28.590257, lng: 77.045586 },
+        ],
+        message: "Road renovation in Dwarka Sec-13. Dept: Roadways",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.648, lng: 77.220 },
+          { lat: 28.655, lng: 77.230 },
+          { lat: 28.645, lng: 77.240 },
+          { lat: 28.638, lng: 77.228 },
+        ],
+        message: "Sewer line overhaul near Civil Lines. Dept: Water",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.590, lng: 77.170 },
+          { lat: 28.598, lng: 77.182 },
+          { lat: 28.584, lng: 77.192 },
+          { lat: 28.576, lng: 77.180 },
+        ],
+        message: "Water main upgrade near R.K. Puram. Dept: Water",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.690, lng: 77.030 },
+          { lat: 28.700, lng: 77.045 },
+          { lat: 28.685, lng: 77.055 },
+          { lat: 28.675, lng: 77.040 },
+        ],
+        message: "Canal cleaning near Najafgarh. Dept: Water",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.550, lng: 77.290 },
+          { lat: 28.560, lng: 77.300 },
+          { lat: 28.545, lng: 77.312 },
+          { lat: 28.535, lng: 77.298 },
+        ],
+        message: "Drainage improvement in Okhla Phase-II. Dept: Water",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.710, lng: 77.180 },
+          { lat: 28.720, lng: 77.195 },
+          { lat: 28.708, lng: 77.205 },
+          { lat: 28.698, lng: 77.190 },
+        ],
+        message: "Water storage upgrade in Bawana. Dept: Water",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.580, lng: 77.090 },
+          { lat: 28.585, lng: 77.100 },
+          { lat: 28.572, lng: 77.105 },
+          { lat: 28.568, lng: 77.092 },
+        ],
+        message: "Pipeline junction reinforcement in Mahipalpur. Dept: Water",
+      },
+    ];
+
+    // Polygons: Red
+    const redPolygons = [
+      {
+        projectCoordinates: [
+          { lat: 28.62346, lng: 77.061881 },
+          { lat: 28.633869, lng: 77.059532 },
+          { lat: 28.636486, lng: 77.066595 },
+          { lat: 28.624064, lng: 77.076874 },
+        ],
+        message: "Building & electrical work in Uttam Nagar. Dept: E&M",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.672, lng: 77.120 },
+          { lat: 28.675, lng: 77.130 },
+          { lat: 28.668, lng: 77.140 },
+          { lat: 28.662, lng: 77.128 },
+        ],
+        message: "Substation upgrade in Rohini. Dept: Power",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.540, lng: 77.240 },
+          { lat: 28.550, lng: 77.255 },
+          { lat: 28.538, lng: 77.260 },
+          { lat: 28.532, lng: 77.245 },
+        ],
+        message: "Underground wiring project in Saket. Dept: E&M",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.635, lng: 77.260 },
+          { lat: 28.640, lng: 77.272 },
+          { lat: 28.630, lng: 77.280 },
+          { lat: 28.625, lng: 77.268 },
+        ],
+        message: "Transformer relocation in Patparganj. Dept: Power",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.580, lng: 77.210 },
+          { lat: 28.588, lng: 77.222 },
+          { lat: 28.575, lng: 77.228 },
+          { lat: 28.565, lng: 77.215 },
+        ],
+        message: "Streetlight expansion in Green Park. Dept: E&M",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.700, lng: 77.160 },
+          { lat: 28.705, lng: 77.172 },
+          { lat: 28.692, lng: 77.180 },
+          { lat: 28.686, lng: 77.165 },
+        ],
+        message: "Electrical cabling in Shalimar Bagh. Dept: Power",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.612, lng: 77.050 },
+          { lat: 28.618, lng: 77.060 },
+          { lat: 28.605, lng: 77.065 },
+          { lat: 28.598, lng: 77.054 },
+        ],
+        message: "Solar panel maintenance near Palam. Dept: Renewable Energy",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.670, lng: 77.280 },
+          { lat: 28.675, lng: 77.290 },
+          { lat: 28.662, lng: 77.295 },
+          { lat: 28.655, lng: 77.285 },
+        ],
+        message: "LED replacement project in Preet Vihar. Dept: E&M",
+      },
+    ];
+
+    // Polygons: Blue
+    const bluePolygons = [
+      {
+        projectCoordinates: [
+          { lat: 28.5601, lng: 77.185 },
+          { lat: 28.5651, lng: 77.195 },
+          { lat: 28.5571, lng: 77.205 },
+          { lat: 28.5501, lng: 77.193 },
+        ],
+        message: "Smart lighting installation in Vasant Vihar. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.630, lng: 77.270 },
+          { lat: 28.640, lng: 77.280 },
+          { lat: 28.625, lng: 77.290 },
+          { lat: 28.620, lng: 77.275 },
+        ],
+        message: "Rainwater harvesting expansion in Laxmi Nagar. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.670, lng: 77.210 },
+          { lat: 28.680, lng: 77.222 },
+          { lat: 28.665, lng: 77.230 },
+          { lat: 28.655, lng: 77.218 },
+        ],
+        message:
+          "Metro feeder line road enhancement near Mukherjee Nagar. Dept: PWD",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.590, lng: 77.250 },
+          { lat: 28.598, lng: 77.265 },
+          { lat: 28.585, lng: 77.272 },
+          { lat: 28.575, lng: 77.260 },
+        ],
+        message: "Public park beautification in Nehru Place. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.705, lng: 77.100 },
+          { lat: 28.712, lng: 77.112 },
+          { lat: 28.698, lng: 77.120 },
+          { lat: 28.690, lng: 77.108 },
+        ],
+        message: "Smart pole installation in Pitampura. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.650, lng: 77.160 },
+          { lat: 28.657, lng: 77.172 },
+          { lat: 28.642, lng: 77.178 },
+          { lat: 28.635, lng: 77.166 },
+        ],
+        message: "CCTV network expansion in Karol Bagh. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.600, lng: 77.130 },
+          { lat: 28.610, lng: 77.140 },
+          { lat: 28.598, lng: 77.152 },
+          { lat: 28.588, lng: 77.138 },
+        ],
+        message: "Park solar light setup in AIIMS Area. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.720, lng: 77.220 },
+          { lat: 28.730, lng: 77.235 },
+          { lat: 28.715, lng: 77.242 },
+          { lat: 28.705, lng: 77.225 },
+        ],
+        message: "Digital signage setup in Narela Zone. Dept: NDMC",
+      },
+      {
+        projectCoordinates: [
+          { lat: 28.520, lng: 77.280 },
+          { lat: 28.530, lng: 77.295 },
+          { lat: 28.518, lng: 77.305 },
+          { lat: 28.508, lng: 77.290 },
+        ],
+        message: "Roadside green cover initiative near Badarpur. Dept: NDMC",
+      },
+    ];
+
+    // Add polygons to map
+    addPolygons(greenPolygons, "#3FC047");
+    addPolygons(redPolygons, "#FF0000");
+    addPolygons(bluePolygons, "#0077FF");
+  };
+
+  // Place search function
   const findPlaces = (query) => {
-    if (!map || !window.google || !window.google.maps.places || !query) {
-      console.log("Map error");
-      return;
-    }
+    if (!map || !window.google || !window.google.maps.places || !query) return;
 
     const service = new window.google.maps.places.PlacesService(map);
     const request = {
-      query: query,
-      fields: ["name", "geometry", "business_status"],
-      locationBias: {
-        radius: 5000,
-        center: { lat: 28.6139, lng: 77.209 },
-      },
+      query,
+      fields: ["name", "geometry"],
+      locationBias: map.getCenter(),
     };
 
     service.textSearch(request, (results, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+      if (
+        status === window.google.maps.places.PlacesServiceStatus.OK &&
+        results
+      ) {
         const bounds = new window.google.maps.LatLngBounds();
-
         results.forEach((place) => {
           if (place.geometry && place.geometry.location) {
             new window.google.maps.Marker({
-              map: map,
+              map,
               position: place.geometry.location,
               title: place.name,
             });
-
             bounds.extend(place.geometry.location);
           }
         });
-
         map.fitBounds(bounds);
       } else {
-        console.log("No results found");
+        alert("No results found");
       }
     });
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearch = () => {
-    findPlaces(searchQuery);
-  };
-
   return (
-    <div className="relative flex justify-center">
-      <div
-        style={{
-          position: "relative",
-          height: "100vh",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 88,
-            left: 10,
-            zIndex: 4,
-            background: "white",
-            padding: "10px",
-            borderRadius: "8px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-          }}
-        >
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search for places..."
-            className="p-2 border border-gray-300 rounded-l"
-          />
-          <button
-            onClick={handleSearch}
-            disabled={!apiLoaded}
-            className="bg-[#005da3] p-2 text-white rounded-r hover:bg-[#00447a]"
-          >
-            Search
-          </button>
-        </div>
-
-        <div
-          ref={mapRef}
-          style={{
-            height: "100vh",
-            width: "100%",
-          }}
+    <div className="relative w-full h-screen">
+      {/* Search Box */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col sm:flex-row items-center bg-white p-2 rounded-lg shadow-md w-11/12 max-w-md">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search for places..."
+          className="p-2 border border-gray-300 rounded-md w-full sm:w-auto sm:flex-1 mb-2 sm:mb-0"
         />
+        <button
+          onClick={() => findPlaces(searchQuery)}
+          disabled={!apiLoaded}
+          className="bg-[#005da3] text-white px-4 py-2 rounded-md sm:ml-2 w-full sm:w-auto hover:bg-[#00447a]"
+        >
+          Search
+        </button>
       </div>
+
+      {/* Map */}
+      <div
+        ref={mapRef}
+        className="w-full h-full rounded-md"
+        style={{ minHeight: "100vh" }}
+      />
     </div>
   );
 };
