@@ -2,17 +2,19 @@ import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/userContext";
 import { db } from "../context/firebase";
 import { doc, getDoc } from "@firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import "../styles/login.css";
 import { useNavigate } from "react-router";
 
 const LoginPage = () => {
-    const [uId, setUId] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [captchaValue, setCaptchaValue] = useState("");
     const [userCaptchaInput, setUserCaptchaInput] = useState("");
     const [error, setError] = useState("");
     const { setUser } = useContext(UserContext);
     const navigate = useNavigate();
+    const auth = getAuth();
 
     const generateCaptcha = () => {
         const charsArray =
@@ -31,45 +33,58 @@ const LoginPage = () => {
     };
 
     const handleLogin = async () => {
-        if (!uId) return;
-
-        const userRef = doc(db, "users", uId);
+        if (!email || !password || !userCaptchaInput) {
+            setError("All fields are required.");
+            return;
+        }
 
         try {
             if (userCaptchaInput !== captchaValue) {
                 setError("CAPTCHA is incorrect.");
+                handleCaptchaRefresh();
                 return;
             }
 
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            const user = userCredential.user;
+
+            const userRef = doc(db, "users", user.uid);
             const userData = await getDoc(userRef);
 
             if (!userData.exists()) {
-                console.log("User doesn't exist");
+                setError("User data not found in database.");
                 return;
             }
 
-            const data = await userData.data();
+            const data = userData.data();
 
-            if (password === data.password) {
-                await setUser(data);
-                await localStorage.setItem("user", JSON.stringify(data));
-                console.log("Logged In");
+            await setUser(data);
+            await localStorage.setItem("user", JSON.stringify(data));
+            console.log("Logged In");
 
-                if (data.role) {
-                    navigate(
-                        `/dashboard/admin/${data.department}/${data.userId}`
-                    );
-                } else {
-                    navigate(
-                        `/dashboard/junior-officer/${data.department}/${data.userId}`
-                    );
-                }
+            if (data.role === "admin") {
+                navigate(`/dashboard/admin/${data.department}/${data.userId}`);
             } else {
-                setError("Invalid password");
+                navigate(
+                    `/dashboard/junior-officer/${data.department}/${data.userId}`
+                );
             }
         } catch (error) {
             console.error("Error logging in: ", error);
-            setError("An error occurred. Please try again.");
+            if (
+                error.code === "auth/wrong-password" ||
+                error.code === "auth/user-not-found" ||
+                error.code === "auth/invalid-email"
+            ) {
+                setError("Invalid email or password");
+            } else {
+                setError("An error occurred. Please try again.");
+            }
+            handleCaptchaRefresh();
         }
     };
 
@@ -83,13 +98,13 @@ const LoginPage = () => {
                 <h2>User Login</h2>
                 <form>
                     <div className="input-group">
-                        <label htmlFor="userId">User Id</label>
+                        <label htmlFor="email">Email</label>
                         <input
-                            type="text"
-                            id="userId"
-                            name="userId"
-                            value={uId}
-                            onChange={(e) => setUId(e.target.value)}
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -136,7 +151,9 @@ const LoginPage = () => {
                         Login
                     </button>
 
-                    {error && <p>{error}</p>}
+                    {error && (
+                        <p className="text-red-500 text-center mt-4">{error}</p>
+                    )}
                 </form>
             </div>
         </div>
