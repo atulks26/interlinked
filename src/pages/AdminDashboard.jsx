@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
 import ProfileImg from "../images/profile.png";
@@ -22,11 +22,41 @@ import {
 } from "react-icons/fa";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
-import ManageJunior from "../pages/ManageJunior"; // Added import for ManageJunior page
+import { db } from "../context/firebase"; 
+import {
+  collection,
+  query,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  where,
+  orderBy,
+  limit
+} from "firebase/firestore"; 
 
 Chart.register(ArcElement, Tooltip, Legend);
 
-// --------------------------- TaskChart Component ---------------------------
+const formatTimeAgo = (timestamp) => {
+    if (!timestamp) return 'Just now';
+    const now = new Date();
+    const date = timestamp.toDate();
+    const seconds = Math.floor((now - date) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + "y ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + "mo ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + "d ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + "h ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + "m ago";
+    return Math.floor(seconds) + "s ago";
+};
+
 const TaskChart = ({ tasks }) => {
   const statusCounts = {
     pending: tasks.filter(t => t.status === 'pending').length,
@@ -56,40 +86,76 @@ const TaskChart = ({ tasks }) => {
   return <div className="max-w-[250px] mx-auto mb-4"><Doughnut data={data} options={options} /></div>;
 };
 
-// --------------------------- TaskModal Component ---------------------------
-const TaskModal = ({ task, onClose }) => {
-  if (!task) return null;
+
+// ---------------- Task Modal (Unchanged) ----------------
+const TaskModal = ({ task, onClose, onSave }) => {
+  const [title, setTitle] = useState(task?.title || "");
+  const [desc, setDesc] = useState(task?.desc || "");
+  const [status, setStatus] = useState(task?.status || "pending");
+  const [progress, setProgress] = useState(task?.progress || 0);
+
+  const handleSave = () => {
+    if (!title || !desc) return alert("Please fill all fields");
+    onSave({ ...task, title, desc, status, progress: Number(progress) });
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg relative">
-        <button onClick={onClose} className="absolute top-3 right-3 text-2xl text-gray-400 hover:text-gray-600">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-md relative">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-2xl text-gray-400 hover:text-gray-600"
+        >
           <FaTimesCircle />
         </button>
-        <h2 className="text-2xl font-bold mb-4">{task.title}</h2>
-        <p className="text-gray-600 mb-4">{task.desc}</p>
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm font-medium text-gray-500">Status:</span>
-          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            task.status === 'overdue' ? 'bg-red-100 text-red-700' :
-            task.status === 'inprogress' ? 'bg-yellow-100 text-yellow-700' :
-            task.status === 'completed' ? 'bg-green-100 text-green-700' :
-            'bg-gray-100 text-gray-700'
-          }`}>
-            {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-          </span>
+        <h2 className="text-2xl font-bold mb-4">{task.id ? "Edit Task" : "Add Task"}</h2>
+        <input
+          type="text"
+          placeholder="Task Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full border rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <textarea
+          placeholder="Task Description"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+          className="w-full border rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <div className="flex gap-3 mb-3 flex-wrap">
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          >
+            <option value="pending">Pending</option>
+            <option value="inprogress">In Progress</option>
+            <option value="overdue">Overdue</option>
+            <option value="completed">Completed</option>
+          </select>
+          <input
+            type="number"
+            value={progress}
+            onChange={(e) => setProgress(Number(e.target.value))}
+            className="w-24 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+            placeholder="Progress %"
+            max="100"
+            min="0"
+          />
         </div>
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-sm font-medium text-gray-500">Progress:</span>
-          <div className="w-3/4 bg-gray-200 rounded-full h-2.5">
-            <div className="bg-yellow-400 h-2.5 rounded-full" style={{ width: `${task.progress}%` }}></div>
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <button className="flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-colors">
-            Update Status
+        <div className="flex justify-end gap-3 flex-wrap">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+          >
+            Cancel
           </button>
-          <button onClick={onClose} className="flex-1 bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">
-            Close
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Save
           </button>
         </div>
       </div>
@@ -97,30 +163,40 @@ const TaskModal = ({ task, onClose }) => {
   );
 };
 
-// --------------------------- ActivityFeedItem Component ---------------------------
 const ActivityFeedItem = ({ activity }) => {
-  const { user, action, target, time } = activity;
+  const { user_name, action, target_name, timestamp } = activity; 
+  
   const iconMap = {
-    completed: <FaCheckCircle className="text-green-500" />,
-    commented: <FaCommentDots className="text-blue-500" />,
-    assigned: <FaUsers className="text-indigo-500" />,
+    completed_task: <FaCheckCircle className="text-green-500" />,
+    created_task: <FaPlus className="text-blue-500" />,
+    updated_task: <FaTasks className="text-yellow-500" />,
+    created_officer: <FaUsers className="text-indigo-500" />,
   };
+
+  const actionTextMap = {
+    completed_task: "completed",
+    created_task: "created task",
+    updated_task: "updated task",
+    created_officer: "added officer",
+    deleted_officer: "deleted officer",
+    updated_officer: "updated officer",
+  };
+
   return (
     <div className="flex gap-3 py-3 border-b border-gray-200 last:border-b-0">
       <div className="mt-1">{iconMap[action] || <FaCheckCircle />}</div>
       <div>
         <p className="text-sm text-gray-700">
-          <span className="font-semibold">{user}</span>
-          {action === 'completed' ? ' completed ' : action === 'commented' ? ' commented on ' : ' was assigned '}
-          <span className="font-semibold">{target}</span>
+          <span className="font-semibold">{user_name || 'User'}</span>
+          {" "}{actionTextMap[action] || action}{" "}
+          <span className="font-semibold">{target_name}</span>
         </p>
-        <p className="text-xs text-gray-400">{time}</p>
+        <p className="text-xs text-gray-400">{formatTimeAgo(timestamp)}</p>
       </div>
     </div>
   );
 };
 
-// --------------------------- StatCard Component ---------------------------
 const StatCard = ({ title, value, icon, color, onClick }) => (
   <div className={`bg-white rounded-lg shadow p-4 flex items-center gap-4 ${onClick ? 'cursor-pointer hover:shadow-md' : ''}`} onClick={onClick}>
     <div className={`text-3xl p-3 rounded-full ${color}`}>
@@ -133,8 +209,7 @@ const StatCard = ({ title, value, icon, color, onClick }) => (
   </div>
 );
 
-// --------------------------- AdminTaskItem Component ---------------------------
-const AdminTaskItem = ({ task, onOpen }) => (
+const TaskItem = ({ task, onOpen }) => (
   <div className="flex flex-col border-2 border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-lg transition-shadow">
     <div className="flex justify-between items-start gap-4 flex-wrap">
       <div className="flex flex-col flex-1 min-w-[60%]">
@@ -155,26 +230,29 @@ const AdminTaskItem = ({ task, onOpen }) => (
   </div>
 );
 
-// --------------------------- AdminSideListItem Component ---------------------------
-const AdminSideListItem = ({ EmployeeName }) => (
-  <div className="flex items-center justify-between border-b py-2 hover:bg-gray-50 rounded transition-colors px-2">
-    <div className="flex items-center gap-2">
-      <img src={ProfileImg} alt="emp_photo" className="w-12 h-12 rounded-full" />
-      <p className="font-medium">{EmployeeName}</p>
+const OfficerListItem = ({ officer }) => (
+    <div className="flex items-center justify-between border-b py-2 hover:bg-gray-50 rounded transition-colors px-2">
+      <div className="flex items-center gap-3 min-w-0">
+        <img src={ProfileImg} alt={officer.user_name} className="w-10 h-10 rounded-full flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="font-medium truncate">{officer.user_name}</p>
+          <p className="text-sm text-gray-500 truncate">{officer.subdepartment || 'N/A'}</p>
+        </div>
+      </div>
+      <Link 
+        to={`/dashboard/admin/${officer.department}/${officer.userId}/officers`} 
+        className="text-sm border border-gray-300 bg-white px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        View
+      </Link>
     </div>
-    <button className="text-sm border-2 border-gray-300 bg-gray-100 p-2 rounded hover:bg-yellow-400 hover:text-gray-800 transition-colors">
-      Profile
-    </button>
-  </div>
-);
+  );
 
-// --------------------------- AdminSidebar Component ---------------------------
 const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
   const capitalizeWords = (str) => {
     if (!str) return "";
     return str.toLowerCase().replace(/-/g, " ").split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
   };
-
   const userDepartment = capitalizeWords(user?.department);
 
   const navGroups = [
@@ -195,13 +273,10 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
     {
       title: "Communicate",
       options: [
-        // { name: "Intra-department Forum", path: `/dashboard/${user?.department}/department-forum`, icon: <FaShareAlt /> },
         { name: "Department Forum", path: `/dashboard/admin/${user?.department}/${user?.userId}/inter-department-forum`, icon: <FaShareAlt /> },
-        // { name: "Resource Sharing", path: `/resource-sharing`, icon: <FaShareAlt /> },
       ]
     }
   ];
-
   const activeLinkStyle = "bg-gray-700 text-white";
   const inactiveLinkStyle = "text-gray-300 hover:bg-gray-700 hover:text-white";
 
@@ -210,7 +285,6 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
       <button onClick={toggleSidebar} className={`p-2 rounded-md text-gray-300 hover:bg-gray-700 transition-all mb-4 ${isOpen ? "self-end" : "self-center"}`}>
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
-
       <div className={`flex flex-col mb-4 pb-4 border-b border-gray-700 ${isOpen ? "items-start" : "items-center"}`}>
         <img src={ProfileImg} alt="Profile" className={`rounded-full ${isOpen ? 'w-16 h-16' : 'w-10 h-10'} transition-all`} />
         {isOpen && (
@@ -221,7 +295,6 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
           </div>
         )}
       </div>
-
       <nav className="flex-1">
         {navGroups.map((group, index) => (
           <div key={index} className="mb-2">
@@ -231,7 +304,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
                 <li key={opt.name} className="relative group"> 
                   <NavLink
                     to={opt.path}
-                    end={opt.name === "Home"}  // ✅ Only "Home" uses exact match
+                    end={opt.name === "Home"}
                     className={({ isActive }) =>
                       `flex items-center gap-3 p-2 rounded-md transition-colors ${isActive ? activeLinkStyle : inactiveLinkStyle} ${!isOpen ? "justify-center" : ""}`
                     }
@@ -250,7 +323,6 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
           </div>
         ))}
       </nav>
-
       <div className="mt-auto pt-4 border-t border-gray-700">
         <button onClick={handleLogout} className={`flex items-center gap-3 p-2 rounded-md w-full transition-colors text-red-400 hover:bg-red-900 hover:text-white ${!isOpen ? "justify-center" : ""}`}>
           <span className="text-xl"><FaSignOutAlt /></span>
@@ -261,15 +333,20 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
   );
 };
 
-// --------------------------- AdminDashboard Component ---------------------------
-const AdminDashboard = () => {
+  const AdminDashboard = () => {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const [filter, setFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [tasks, setTasks] = useState([]); 
   const [selectedTask, setSelectedTask] = useState(null);
+  const [officers, setOfficers] = useState([]); 
+  
+  const [activities, setActivities] = useState([]); 
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogout = () => {
     setUser(null);
@@ -279,32 +356,114 @@ const AdminDashboard = () => {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  // Mock Data
-  const mockTasks = [
-    { id: 1, title: "Prepare Report", desc: "Monthly department report", progress: 80, status: 'inprogress' },
-    { id: 2, title: "Audit Review", desc: "Quarterly audit review", progress: 45, status: 'inprogress' },
-    { id: 3, title: "Team Meeting", desc: "Discuss project milestones", progress: 60, status: 'pending' },
-    { id: 4, title: "Onboard New Hire", desc: "Prepare docs for new hire", progress: 10, status: 'overdue' },
-    { id: 5, title: "Finalize Budget", desc: "Finalize Q4 budget", progress: 90, status: 'completed' },
-  ];
+  const logActivity = async (action, target_name, target_id = null) => {
+    if (!user || !user.department) return;
+    try {
+      const activitiesRef = collection(db, "departments", user.department, "activities");
+      await addDoc(activitiesRef, {
+        user_name: user.user_name,
+        user_id: user.userId,
+        action: action,
+        target_name: target_name,
+        target_id: target_id,
+        timestamp: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("Error logging activity:", error);
+    }
+  };
 
-  const mockEmployees = ["Priyanshu", "Anushka" , "Atul", "Ankur", "Nehal", "Garv", "Sonia", "Rahul"];
+  useEffect(() => {
+    if (!user || !user.department) {
+        setIsLoading(true);
+        return;
+    }
+    
+    setIsLoading(true);
+    const department = user.department;
 
-  const mockActivity = [
-    { id: 1, user: 'Priyanshu', action: 'completed', target: 'Prepare Report', time: '2 hours ago' },
-    { id: 2, user: 'Atul', action: 'commented', target: 'Audit Review', time: '3 hours ago' },
-    { id: 3, user: 'Ankur', action: 'assigned', target: 'Finalize Budget', time: '1 day ago' },
-    { id: 4, user: 'Admin', action: 'commented', target: 'Prepare Report', time: '2 days ago' },
-  ];
+    const tasksRef = collection(db, "departments", department, "tasks");
+    const qTasks = query(tasksRef, orderBy("createdAt", "desc"));
+    const unsubTasks = onSnapshot(qTasks, (snapshot) => {
+      setTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => console.error("Error fetching tasks: ", error));
 
-  const filteredTasks = mockTasks.filter(task => {
+    const usersRef = collection(db, "users");
+    const qOfficers = query(
+      usersRef,
+      where("department", "==", department),
+      where("role", "==", "junior-officer")
+    );
+    const unsubOfficers = onSnapshot(qOfficers, (snapshot) => {
+      setOfficers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => console.error("Error fetching officers: ", error));
+
+    const activitiesRef = collection(db, "departments", department, "activities");
+    const qActivities = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
+    const unsubActivities = onSnapshot(qActivities, (snapshot) => {
+        setActivities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setIsLoading(false);
+    }, (error) => {
+        console.error("Error fetching activities: ", error);
+        setIsLoading(false);
+    });
+
+    return () => {
+      unsubTasks();
+      unsubOfficers();
+      unsubActivities();
+    };
+  }, [user]); 
+
+  const handleAddOrEditTask = async (taskDataFromModal) => {
+    const authorId = user?.userId;
+    if (!authorId || !user?.department) {
+        alert("Error: User data incomplete.");
+        return;
+    }
+    
+    const tasksColRef = collection(db, "departments", user.department, "tasks");
+
+    try {
+      if (taskDataFromModal.id) {
+        const dataToUpdate = {
+          title: taskDataFromModal.title,
+          desc: taskDataFromModal.desc,
+          status: taskDataFromModal.status,
+          progress: taskDataFromModal.progress,
+          updatedAt: serverTimestamp(),
+          updatedBy: authorId
+        };
+        const taskRef = doc(db, "departments", user.department, "tasks", taskDataFromModal.id);
+        await updateDoc(taskRef, dataToUpdate);
+        
+        await logActivity("updated_task", taskDataFromModal.title, taskDataFromModal.id);
+        
+      } else {
+        const newTask = {
+          ...taskDataFromModal,
+          authorId: authorId,
+          createdBy: authorId,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          department: user.department
+        };
+        const docRef = await addDoc(tasksColRef, newTask);
+        
+        await logActivity("created_task", taskDataFromModal.title, docRef.id);
+      }
+      setShowTaskModal(false);
+      setEditingTask(null);
+    } catch (error) {
+      console.error("Error saving task:", error);
+      alert(`Failed to save task: ${error.message}`);
+    }
+  };
+
+  const filteredTasks = tasks.filter(task => {
     if (filter === 'all') return true;
     return task.status === filter;
   });
-
-  const filteredEmployees = mockEmployees.filter(name =>
-    name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="flex flex-row min-h-screen bg-gray-100">
@@ -317,66 +476,98 @@ const AdminDashboard = () => {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <p className="text-gray-600">Welcome back, {user?.user_name || "Admin"}!</p>
           </div>
-          <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-colors flex items-center gap-2 justify-center sm:w-auto w-full">
+          <button 
+            onClick={() => { setEditingTask({}); setShowTaskModal(true); }} 
+            className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition-colors flex items-center gap-2 justify-center sm:w-auto w-full"
+          >
             <FaPlus />
             <span>New Task</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <StatCard title="Total Tasks" value={mockTasks.length} icon={<FaClipboardList />} color="bg-blue-100 text-blue-600" onClick={() => setFilter('all')} />
-          <StatCard title="In Progress" value={mockTasks.filter(t => t.status === 'inprogress').length} icon={<FaSpinner className="animate-spin" />} color="bg-yellow-100 text-yellow-600" onClick={() => setFilter('inprogress')} />
-          <StatCard title="Overdue" value={mockTasks.filter(t => t.status === 'overdue').length} icon={<FaExclamationTriangle />} color="bg-red-100 text-red-600" onClick={() => setFilter('overdue')} />
-          <StatCard title="Total Staff" value={mockEmployees.length} icon={<FaUsers />} color="bg-green-100 text-green-600" />
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1 flex flex-col gap-4">
-            <div className="bg-white rounded shadow p-4">
-              <h2 className="text-xl font-semibold mb-4">Department Tasks ({filter === 'all' ? 'All' : filter})</h2>
-              <TaskChart tasks={mockTasks} />
-              <div className="flex flex-col gap-4 mt-4">
-                {filteredTasks.map(task => (
-                  <AdminTaskItem key={task.id} task={task} onOpen={setSelectedTask} />
-                ))}
-              </div>
+        {isLoading ? (
+             <div className="flex justify-center items-center h-64">
+                <FaSpinner className="animate-spin text-4xl text-gray-500" />
             </div>
-          </div>
+        ) : (
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <StatCard title="Total Tasks" value={tasks.length} icon={<FaClipboardList />} color="bg-blue-100 text-blue-600" onClick={() => setFilter('all')} />
+                    <StatCard title="In Progress" value={tasks.filter(t => t.status === 'inprogress').length} icon={<FaSpinner />} color="bg-yellow-100 text-yellow-600" onClick={() => setFilter('inprogress')} />
+                    <StatCard title="Overdue" value={tasks.filter(t => t.status === 'overdue').length} icon={<FaExclamationTriangle />} color="bg-red-100 text-red-600" onClick={() => setFilter('overdue')} />
+                    <StatCard title="Total Staff" value={officers.length} icon={<FaUsers />} color="bg-green-100 text-green-600" />
+                </div>
 
-          <div className="w-full lg:w-1/3 flex flex-col gap-4">
-            <div className="bg-white rounded shadow p-4">
-              <h2 className="text-xl font-semibold mb-4">Manage Junior Officers</h2>
-              <div className="relative mb-4">
-                <input
-                  type="search"
-                  placeholder="Find an officer..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
-                />
-                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              </div>
-              <div className="flex flex-col gap-2">
-                {filteredEmployees.map((name, i) => (
-                  <AdminSideListItem key={i} EmployeeName={name} />
-                ))}
-              </div>
-            </div>
+                <div className="flex flex-col lg:flex-row gap-4">
+                    <div className="flex-1 flex flex-col gap-4">
+                        <div className="bg-white rounded shadow p-4">
+                            <h2 className="text-xl font-semibold mb-4">Department Tasks ({filter === 'all' ? 'All' : filter})</h2>
+                            <TaskChart tasks={tasks} />
+                            <div className="flex flex-col gap-4 mt-4 max-h-96 overflow-y-auto">
+                                {filteredTasks.length > 0 ? (
+                                    filteredTasks.map(task => (
+                                        <TaskItem key={task.id} task={task} onOpen={setSelectedTask} />
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-center">No tasks found for this filter.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
 
-            <div className="bg-white rounded shadow p-4">
-              <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-              <div className="flex flex-col">
-                {mockActivity.map(activity => (
-                  <ActivityFeedItem key={activity.id} activity={activity} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+                    <div className="w-full lg:w-1/3 flex flex-col gap-4">
+                        <div className="bg-white rounded shadow p-4">
+                            <h2 className="text-xl font-semibold mb-4">Junior Officers</h2>
+                            <div className="flex flex-col gap-2 max-h-96 overflow-y-auto">
+                                {officers.length > 0 ? (
+                                officers.map((officer) => (
+                                    <OfficerListItem key={officer.id} officer={officer} />
+                                ))
+                                ) : (
+                                <p className="text-gray-500 text-center">No junior officers found.</p>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="bg-white rounded shadow p-4">
+                            <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+                            <div className="flex flex-col">
+                                {activities.length > 0 ? (
+                                    activities.map(activity => (
+                                        <ActivityFeedItem key={activity.id} activity={activity} />
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-center text-sm">No recent activity.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )}
       </div>
 
       {selectedTask && (
-        <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg relative">
+            <button onClick={() => setSelectedTask(null)} className="absolute top-3 right-3 text-2xl text-gray-400 hover:text-gray-600">
+              <FaTimesCircle />
+            </button>
+            <h2 className="text-2xl font-bold mb-4">{selectedTask.title}</h2>
+            <p className="text-gray-600 mb-4">{selectedTask.desc}</p>
+            <p><strong>Status:</strong> {selectedTask.status}</p>
+            <p><strong>Progress:</strong> {selectedTask.progress}%</p>
+          </div>
+        </div>
+      )}
+      
+      {/* Add/Edit Task Modal */}
+      {showTaskModal && (
+        <TaskModal
+          task={editingTask || {}}
+          onClose={() => { setShowTaskModal(false); setEditingTask(null); }}
+          onSave={handleAddOrEditTask}
+        />
       )}
     </div>
   );

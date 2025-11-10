@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   FaPaperPlane,
   FaReply,
@@ -6,9 +6,9 @@ import {
   FaHashtag,
   FaBars,
 } from "react-icons/fa";
-import AdminSidebar from "../components/Sidebar"; // Assuming this component exists
+import AdminSidebar from "../components/Sidebar";
+import { UserContext } from "../context/userContext";
 
-// 🏢 Department and Channel Lists
 const departments = [
   "Architecture Department",
   "Advertisement",
@@ -37,9 +37,7 @@ const channels = [
   "#support",
 ];
 
-// 👥 Users
 const users = [
-  "Sanchita",
   "Priyanshu",
   "Atul",
   "Ritika",
@@ -53,7 +51,6 @@ const users = [
   "Isha",
 ];
 
-// 💬 Message Pool (expanded)
 const messagesPool = [
   "Please review the latest updates.",
   "Any feedback on the recent changes?",
@@ -72,9 +69,8 @@ const messagesPool = [
   "Check the shared folder for updated templates.",
 ];
 
-// 🔧 Message Generator
 const generateMessages = (dept, channel) => {
-  const msgCount = Math.floor(Math.random() * 10) + 10; // more messages
+  const msgCount = Math.floor(Math.random() * 10) + 10;
   return Array.from({ length: msgCount }, (_, i) => {
     const user = users[Math.floor(Math.random() * users.length)];
     return {
@@ -93,7 +89,8 @@ const generateMessages = (dept, channel) => {
   });
 };
 
-const DepartmentForum = ({ user, handleLogout }) => {
+const DepartmentForum = () => {
+  const { user } = useContext(UserContext);
   const [selectedDept, setSelectedDept] = useState(departments[0]);
   const [selectedChannel, setSelectedChannel] = useState(channels[0]);
   const [messages, setMessages] = useState(
@@ -106,12 +103,10 @@ const DepartmentForum = ({ user, handleLogout }) => {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Regenerate messages when department/channel changes
   useEffect(() => {
     setMessages(generateMessages(selectedDept, selectedChannel));
   }, [selectedDept, selectedChannel]);
 
-  // Scroll to bottom ONLY when "You" send a message
   useEffect(() => {
     if (messages.length > 0 && messages[messages.length - 1].author === "You") {
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -169,17 +164,13 @@ const DepartmentForum = ({ user, handleLogout }) => {
         <AdminSidebar />
       </div>
 
-      {/* MOBILE OVERLAY (LEFT SIDEBAR) */}
-      {leftSidebarOpen && (
-        <div
+      {leftSidebarOpen && (        <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={() => setLeftSidebarOpen(false)}
         ></div>
       )}
 
-      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col h-full p-4 md:p-6 overflow-hidden">
-        {/* HEADER */}
         <div className="bg-white rounded-lg shadow p-4 mb-4 flex justify-between items-center flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
@@ -200,7 +191,6 @@ const DepartmentForum = ({ user, handleLogout }) => {
           </button>
         </div>
 
-        {/* CHAT HEADER */}
         <div className="bg-white p-4 rounded-lg shadow mb-4 flex justify-between items-center flex-shrink-0">
           <h2 className="text-xl font-semibold text-gray-800">
             {selectedDept} {selectedChannel}
@@ -208,7 +198,6 @@ const DepartmentForum = ({ user, handleLogout }) => {
           <span className="text-gray-500 text-sm">{messages.length} messages</span>
         </div>
 
-        {/* CHAT AREA */}
         <div className="flex-1 overflow-y-auto bg-white rounded-lg shadow p-4 space-y-4 border border-gray-300 custom-scrollbar">
           {messages.map((msg, index) => (
             <div key={msg.id} className="border border-gray-200 rounded-lg p-4">
@@ -270,7 +259,6 @@ const DepartmentForum = ({ user, handleLogout }) => {
           <div ref={chatEndRef} />
         </div>
 
-        {/* INPUT BAR */}
         <div className="bg-white p-4 mt-4 rounded-lg shadow flex gap-3 flex-shrink-0">
           <input
             type="text"
@@ -289,7 +277,6 @@ const DepartmentForum = ({ user, handleLogout }) => {
         </div>
       </div>
 
-      {/* RIGHT SIDEBAR */}
       <div
         className={`fixed md:static right-0 top-0 z-50 h-full bg-white shadow-md transform transition-transform duration-300 
           ${rightSidebarOpen ? "translate-x-0" : "translate-x-full"} md:translate-x-0 w-72`}
@@ -340,7 +327,6 @@ const DepartmentForum = ({ user, handleLogout }) => {
         </div>
       </div>
 
-      {/* MOBILE OVERLAY (RIGHT SIDEBAR) */}
       {rightSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"

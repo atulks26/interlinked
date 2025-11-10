@@ -28,17 +28,6 @@ import ManageJunior from "./pages/ManageJunior";
 import DepartmentTasksPage from "./pages/DepartmentTasksPage";
 
 function App() {
-    // Temporary simulated user (replace later with real logged-in data)
-    const user = {
-        userId: "admin123",
-        user_name: "Ankur Sharma",
-        department: "engineering",
-    };
-
-    const handleLogout = () => {
-        alert("You have been logged out.");
-    };
-
     return (
         <div>
             <Router>
@@ -66,27 +55,21 @@ function App() {
                     <Route path="/training" element={<Training />} />
                     <Route path="/forum" element={<Forum />} />
                     <Route path="/projectspage" element={<ProjectsPage />} />
-                    <Route path="/statuspage" element={<StatusPage />} />
+                    {/* <Route path="/statuspage" element={<StatusPage />} /> */}
                     <Route path="/forum/topic/:id" element={<TopicDetail />} />
                     <Route path="/register" element={<RegistrationForm />} />
-
-                    {/* ✅ Intra-Department Forum */}
-                    <Route
-                        path="/dashboard/:department/department-forum"
-                        element={<DepartmentForum />}
-                    />
 
                     {/* ✅ Inter-Department Forum */}
                     <Route
                         path="/dashboard/admin/:department/:id/inter-department-forum"
-                        element={<InterDepartmentForum user={user} handleLogout={handleLogout} />}
+                        element={<InterDepartmentForum/>}
                     />
 
-                    <Route
+                    {/* <Route
                         path="/statuspage"
                         element={<OngoingStatusPage />}
-                    />
-                    <Route path="/project-form" element={<ProjectForm />} />
+                    /> */}
+                    {/* <Route path="/project-form" element={<ProjectForm />} /> */}
                     <Route
                         path="/dashboard/junior-officer/:department/:id/profile"
                         element={<EmployeeProfile />}

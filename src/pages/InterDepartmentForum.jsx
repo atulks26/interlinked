@@ -1,10 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react"; // Import useContext
 import {
   FaPaperPlane,
   FaReply,
   FaHashtag,
 } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
+import { UserContext } from "../context/userContext"; // Import UserContext
+import { db } from "../context/firebase"; // Import db
+import {
+  collection,
+  query,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  arrayUnion,
+  orderBy,
+  serverTimestamp,
+} from "firebase/firestore"; // Import firestore functions
 
 const departments = [
   "Architecture Department",
@@ -20,83 +33,112 @@ const departments = [
 ];
 
 const channels = ["#general", "#projects", "#announcements", "#updates"];
-const users = ["Ankur", "Sanchita", "Priyanshu", "Atul", "Ritika", "Rahul", "Pooja"];
-const messagesPool = [
-  "Please review the latest updates.",
-  "Any feedback on the recent changes?",
-  "Reminder: Submit your reports by EOD.",
-  "Project X completed successfully.",
-  "Meeting scheduled for 3 PM.",
-];
 
-const generateMessages = (dept, channel) => {
-  const msgCount = Math.floor(Math.random() * 5) + 5;
-  return Array.from({ length: msgCount }, (_, i) => {
-    const user = users[Math.floor(Math.random() * users.length)];
-    return {
-      id: `${dept}-${channel}-${i}`,
-      department: user,
-      avatar: `https://i.pravatar.cc/40?u=${dept}-${i}`,
-      message: messagesPool[Math.floor(Math.random() * messagesPool.length)],
-      time: new Date(Date.now() - Math.floor(Math.random() * 1000000000)).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      replies: [],
-    };
-  });
-};
+// Removed local user/message pools
 
 const InterDepartmentForum = () => {
+  const { user } = useContext(UserContext); // Get current user
   const [selectedDept, setSelectedDept] = useState(departments[0]);
   const [selectedChannel, setSelectedChannel] = useState(channels[0]);
-  const [messages, setMessages] = useState(generateMessages(departments[0], channels[0]));
+  const [messages, setMessages] = useState([]); // Default to empty array
   const [newMessage, setNewMessage] = useState("");
   const [replyIndex, setReplyIndex] = useState(null);
   const [replyText, setReplyText] = useState("");
   const chatEndRef = useRef(null);
 
+  // Fetch messages from Firestore on component mount and when dept/channel changes
   useEffect(() => {
-    setMessages(generateMessages(selectedDept, selectedChannel));
-  }, [selectedDept, selectedChannel]);
+    if (!selectedDept || !selectedChannel) return;
+
+    // Define the collection path
+    const messagesRef = collection(
+      db,
+      "inter-department-chats",
+      selectedDept,
+      selectedChannel,
+      "messages"
+    );
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        // Convert firestore timestamp to JS Date, then toLocaleTimeString
+        time: doc.data().timestamp?.toDate().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      }));
+      setMessages(msgs);
+    });
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
+  }, [selectedDept, selectedChannel]); // Re-run when these change
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !user) return;
     const msg = {
-      id: `msg-${Date.now()}`,
-      department: "You",
-      avatar: `https://i.pravatar.cc/40?u=you-${Date.now()}`,
+      author: user.user_name || "You", // Use logged-in user's name
+      avatar: `https://i.pravatar.cc/40?u=${user.userId}`, // Use user ID for consistent avatar
       message: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      timestamp: serverTimestamp(), // Use server timestamp
       replies: [],
     };
-    setMessages((prev) => [...prev, msg]);
-    setNewMessage("");
+
+    // Add new message to the correct firestore collection
+    const messagesRef = collection(
+      db,
+      "inter-department-chats",
+      selectedDept,
+      selectedChannel,
+      "messages"
+    );
+    await addDoc(messagesRef, msg);
+    setNewMessage(""); // Clear input
   };
 
-  const handleSendReply = (index) => {
-    if (!replyText.trim()) return;
-    setMessages((prev) => {
-      const updated = [...prev];
-      updated[index].replies.push({
-        id: `reply-${Date.now()}`,
-        user: "You",
-        message: replyText,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      });
-      return updated;
+  const handleSendReply = async (index) => {
+    if (!replyText.trim() || !user) return;
+    
+    const messageToReply = messages[index];
+    if (!messageToReply || !messageToReply.id) return; // Ensure we have a firestore doc ID
+
+    // Define the document path
+    const msgDocRef = doc(
+      db,
+      "inter-department-chats",
+      selectedDept,
+      selectedChannel,
+      "messages",
+      messageToReply.id
+    );
+
+    const newReply = {
+      id: `reply-${Date.now()}`,
+      user: user.user_name || "You",
+      message: replyText,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    // Atomically add the new reply to the 'replies' array in Firestore
+    await updateDoc(msgDocRef, {
+      replies: arrayUnion(newReply),
     });
+
     setReplyText("");
     setReplyIndex(null);
   };
 
   return (
     <div className="flex">
-      ✅ Sidebar same as ManageJunior
+      {/* ✅ Sidebar same as ManageJunior */}
       <Sidebar type="admin" />
 
       {/* ✅ Main Content */}
@@ -150,7 +192,8 @@ const InterDepartmentForum = () => {
                 <img src={msg.avatar} alt="" className="w-10 h-10 rounded-full" />
                 <div className="flex-1">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800">{msg.department}</h3>
+                    {/* Changed msg.department to msg.author */}
+                    <h3 className="font-semibold text-gray-800">{msg.author}</h3>
                     <span className="text-xs text-gray-400">{msg.time}</span>
                   </div>
                   <p className="mt-1 text-gray-700">{msg.message}</p>

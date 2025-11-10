@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "@firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore"; // Import serverTimestamp
 import { db } from "../context/firebase";
 
 const RegistrationForm = () => {
@@ -29,9 +29,15 @@ const RegistrationForm = () => {
     const auth = getAuth();
 
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
-        if (files) setFormData({ ...formData, [name]: files[0] });
-        else setFormData({ ...formData, [name]: value });
+        const { name, value, type, files } = e.target;
+        // Explicitly handle file inputs to avoid accidental truthy checks
+        if (type === "file") {
+            const file = files && files.length > 0 ? files[0] : null;
+            setFormData({ ...formData, [name]: file });
+            return;
+        }
+
+        setFormData({ ...formData, [name]: value });
     };
 
     const nextStep = () => step < totalSteps && setStep(step + 1);
@@ -43,39 +49,39 @@ const RegistrationForm = () => {
 
         setIsSubmitting(true);
 
-        const {
-            departmentName,
-            departmentType,
-            registrationNumber,
-            address,
-            contactPerson,
-            contactPosition,
-            email,
-            phoneNumber,
-            authorizationDoc,
-            taxProof,
-            username,
-            password,
-            confirmPassword,
-        } = formData;
+        // Log current state to help debugging unexpected alerts
+        console.debug("Register submit", { step, totalSteps, formData });
 
-        if (
-            !departmentName ||
-            !departmentType ||
-            !registrationNumber ||
-            !address ||
-            !contactPerson ||
-            !contactPosition ||
-            !email ||
-            !phoneNumber ||
-            !authorizationDoc ||
-            !taxProof ||
-            !username ||
-            !password ||
-            !confirmPassword
-        ) {
+        // Explicit required fields list for clarity
+        const requiredFields = [
+            "departmentName",
+            "departmentType",
+            "registrationNumber",
+            "address",
+            "contactPerson",
+            "contactPosition",
+            "email",
+            "phoneNumber",
+            "username",
+            "password",
+            "confirmPassword",
+        ];
+
+        const missing = requiredFields.filter((f) => {
+            const val = formData[f];
+            return (
+                val === null ||
+                val === undefined ||
+                (typeof val === "string" && val.trim() === "")
+            );
+        });
+
+        if (missing.length > 0) {
+            // Give a clear list of what's missing instead of a generic message
             alert(
-                "Error: Not all fields were filled. Please go back and complete the entire form."
+                `Please complete the following fields before submitting: ${missing.join(
+                    ", "
+                )}`
             );
             setIsSubmitting(false);
             return;
@@ -87,33 +93,75 @@ const RegistrationForm = () => {
             return;
         }
 
+        let createdUser = null;
         try {
+            // 1. Create the user in Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 formData.email,
                 formData.password
             );
-            const user = userCredential.user;
+            createdUser = userCredential.user;
 
-            const userDocRef = doc(db, "users", user.uid);
+            // 2. Generate a clean department ID (e.g., "Public Health" -> "public-health")
+            const departmentId = formData.departmentName
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, "") // Remove special chars
+                .replace(/[\s_-]+/g, "-") // Replace spaces/underscores with a dash
+                .trim();
 
+            if (!departmentId) {
+                // Clean up the created auth user to avoid orphan accounts
+                try {
+                    await createdUser.delete();
+                } catch (delErr) {
+                    console.error("Failed to delete orphaned user:", delErr);
+                }
+                alert("Invalid department name. Please check and try again.");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // 3. Add the Admin to the top-level 'users' collection
+            const userDocRef = doc(db, "users", createdUser.uid);
             await setDoc(userDocRef, {
-                userId: user.uid,
+                userId: createdUser.uid,
                 user_name: formData.contactPerson,
                 email: formData.email,
-                department: formData.departmentName,
-                role: "junior-officer",
+                department: departmentId, // Save the clean department ID
+                role: "admin", // This is the department admin
                 contactPosition: formData.contactPosition,
                 phoneNumber: formData.phoneNumber,
+                createdAt: serverTimestamp(),
+            });
+
+            // 4. Create the Department in the top-level 'departments' collection
+            const deptDocRef = doc(db, "departments", departmentId);
+            await setDoc(deptDocRef, {
+                departmentName: formData.departmentName,
+                departmentType: formData.departmentType,
                 registrationNumber: formData.registrationNumber,
                 address: formData.address,
-                departmentType: formData.departmentType,
+                adminId: createdUser.uid, // Link to the admin user
+                adminName: formData.contactPerson,
+                createdAt: serverTimestamp(),
             });
 
             setIsSubmitting(false);
             setIsSubmitted(true);
         } catch (error) {
             console.error("Error registering user:", error);
+
+            // If we created an auth user but something else failed, attempt cleanup
+            if (createdUser) {
+                try {
+                    await createdUser.delete();
+                    console.info("Deleted orphaned auth user after failure.");
+                } catch (delErr) {
+                    console.error("Failed to delete orphaned user:", delErr);
+                }
+            }
+
             alert(`Registration failed: ${error.message}`);
             setIsSubmitting(false);
         }
@@ -254,7 +302,6 @@ const RegistrationForm = () => {
                                         name="authorizationDoc"
                                         accept="image/*,application/pdf"
                                         onChange={handleChange}
-                                        required
                                         className="w-full p-4 border-2 border-gray-300 rounded-lg"
                                     />
                                     {formData.authorizationDoc && (
@@ -278,7 +325,6 @@ const RegistrationForm = () => {
                                         name="taxProof"
                                         accept="image/*,application/pdf"
                                         onChange={handleChange}
-                                        required
                                         className="w-full p-4 border-2 border-gray-300 rounded-lg"
                                     />
                                     {formData.taxProof && (

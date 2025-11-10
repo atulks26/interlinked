@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Sidebar from './Sidebar';
-import { FaEye, FaEdit, FaPlus, FaTimes, FaBars } from 'react-icons/fa';
+import { FaEye, FaEdit, FaPlus, FaTimes, FaBars, FaSpinner } from 'react-icons/fa';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import { UserContext } from '../context/userContext';
+import { db } from '../context/firebase';
+import {
+    collection,
+    query,
+    orderBy,
+    onSnapshot,
+    addDoc,
+    updateDoc,
+    doc,
+    serverTimestamp,
+} from 'firebase/firestore';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
-// ---------------- Card Component ----------------
-const Card = ({ project, onView, onEdit }) => {
+const Card = ({ project, onView, onEdit, isAdmin }) => {
     const statusColor =
         project.status === 'Completed'
             ? 'text-green-500'
@@ -22,7 +33,8 @@ const Card = ({ project, onView, onEdit }) => {
                 <p className="text-gray-700 text-sm mb-1">{project.desc}</p>
                 <p className="text-gray-600 text-sm mb-1">Members: {project.members}</p>
                 <p className="text-gray-500 text-sm mb-2">
-                    Duration: {project.startDate} - {project.endDate}
+                    Duration: {project.startDate?.toDate ? project.startDate.toDate().toLocaleDateString() : project.startDate} - 
+                                {project.endDate?.toDate ? project.endDate.toDate().toLocaleDateString() : project.endDate}
                 </p>
                 <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
                     <div
@@ -46,114 +58,57 @@ const Card = ({ project, onView, onEdit }) => {
                 >
                     <FaEye /> View
                 </button>
-                <button
-                    onClick={() => onEdit(project)}
-                    className="flex items-center gap-1 px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
-                >
-                    <FaEdit /> Edit
-                </button>
+                
+                {isAdmin && (
+                    <button
+                        onClick={() => onEdit(project)}
+                        className="flex items-center gap-1 px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
+                    >
+                        <FaEdit /> Edit
+                    </button>
+                )}
             </div>
         </div>
     );
 };
 
-// ---------------- Main Projects Page ----------------
 const ProjectsPage = () => {
+    const { user } = useContext(UserContext); 
+    const isAdmin = user?.role === 'admin'; 
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [filter, setFilter] = useState('All');
-    const [projects, setProjects] = useState([
-        {
-            id: 1,
-            name: 'Urban Transport Revamp',
-            desc: 'Improve city bus routes and metro connectivity.',
-            members: 12,
-            status: 'Ongoing',
-            progress: 55,
-            startDate: '2025-11-01',
-            endDate: '2026-04-30',
-            tasks: [
-                { id: 1, name: 'Survey Existing Routes', status: 'Completed', progress: 100 },
-                { id: 2, name: 'Route Optimization', status: 'Ongoing', progress: 50 },
-                { id: 3, name: 'Public Awareness Campaign', status: 'Pending', progress: 0 },
-            ],
-        },
-        {
-            id: 2,
-            name: 'Smart Traffic Signals',
-            desc: 'Install smart traffic signals in high congestion zones.',
-            members: 8,
-            status: 'Completed',
-            progress: 100,
-            startDate: '2025-09-15',
-            endDate: '2025-12-15',
-            tasks: [
-                { id: 1, name: 'Identify High Traffic Areas', status: 'Completed', progress: 100 },
-                { id: 2, name: 'Install Sensors', status: 'Completed', progress: 100 },
-                { id: 3, name: 'Integration Testing', status: 'Completed', progress: 100 },
-            ],
-        },
-        {
-            id: 3,
-            name: 'Water Supply Network Upgrade',
-            desc: 'Enhance city water pipelines and reduce leakage.',
-            members: 10,
-            status: 'Ongoing',
-            progress: 40,
-            startDate: '2025-10-01',
-            endDate: '2026-03-31',
-            tasks: [
-                { id: 1, name: 'Pipeline Audit', status: 'Completed', progress: 100 },
-                { id: 2, name: 'Pipeline Replacement', status: 'Ongoing', progress: 30 },
-                { id: 3, name: 'Leakage Detection', status: 'Ongoing', progress: 20 },
-            ],
-        },
-        {
-            id: 4,
-            name: 'Public Park Renovation',
-            desc: 'Upgrade city parks with new amenities.',
-            members: 7,
-            status: 'Ongoing',
-            progress: 35,
-            startDate: '2025-11-05',
-            endDate: '2026-02-28',
-            tasks: [
-                { id: 1, name: 'Design Layout', status: 'Completed', progress: 100 },
-                { id: 2, name: 'Install Playgrounds', status: 'Ongoing', progress: 40 },
-                { id: 3, name: 'Landscaping', status: 'Ongoing', progress: 20 },
-            ],
-        },
-        {
-            id: 5,
-            name: 'City Energy Optimization',
-            desc: 'Implement energy-efficient street lighting and buildings.',
-            members: 9,
-            status: 'Pending',
-            progress: 15,
-            startDate: '2025-11-15',
-            endDate: '2026-05-31',
-            tasks: [
-                { id: 1, name: 'Audit Current Energy Usage', status: 'Pending', progress: 0 },
-                { id: 2, name: 'Plan LED Street Lights', status: 'Pending', progress: 0 },
-            ],
-        },
-        {
-            id: 6,
-            name: 'Smart Waste Management',
-            desc: 'Introduce IoT-enabled waste bins and recycling programs.',
-            members: 8,
-            status: 'Ongoing',
-            progress: 50,
-            startDate: '2025-10-01',
-            endDate: '2025-12-31',
-            tasks: [
-                { id: 1, name: 'Install Smart Bins', status: 'Ongoing', progress: 60 },
-                { id: 2, name: 'Waste Segregation Campaign', status: 'Ongoing', progress: 50 },
-            ],
-        },
-    ]);
-
+    
+    const [projects, setProjects] = useState([]); 
+    const [isLoading, setIsLoading] = useState(true); 
+    
     const [selectedProject, setSelectedProject] = useState(null);
-    const [projectModal, setProjectModal] = useState(null);
+    const [projectModal, setProjectModal] = useState(null); 
+
+    useEffect(() => {
+        if (!user || !user.department) {
+            setIsLoading(true);
+            return;
+        }
+
+        setIsLoading(true);
+        const projectsCollectionRef = collection(db, "departments", user.department, "projects");
+        const q = query(projectsCollectionRef, orderBy("startDate", "desc"));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetchedProjects = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setProjects(fetchedProjects);
+            setIsLoading(false);
+        }, (error) => {
+            console.error("Error fetching projects: ", error);
+            setIsLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
 
     const getChartData = (project) => ({
         labels: ['Completed', 'Ongoing', 'Pending'],
@@ -171,35 +126,56 @@ const ProjectsPage = () => {
         ],
     });
 
-    const handleSaveProject = (e) => {
+    const handleSaveProject = async (e) => {
         e.preventDefault();
-        if (projectModal.id) {
-            setProjects(projects.map((p) => (p.id === projectModal.id ? projectModal : p)));
-        } else {
-            setProjects([...projects, { ...projectModal, id: Date.now(), tasks: [] }]);
+        if (!isAdmin) {
+            alert("You do not have permission to perform this action.");
+            return;
         }
-        setProjectModal(null);
+        if (!user || !user.department) {
+            alert("Error: User department not found. Cannot save project.");
+            return;
+        }
+
+        try {
+            if (projectModal.id) {
+                const projectDocRef = doc(db, "departments", user.department, "projects", projectModal.id);
+                const { id, ...dataToSave } = projectModal;
+                await updateDoc(projectDocRef, {
+                    ...dataToSave,
+                    updatedAt: serverTimestamp(), 
+                });
+            } else {
+                const projectsCollectionRef = collection(db, "departments", user.department, "projects");
+                await addDoc(projectsCollectionRef, {
+                    ...projectModal,
+                    department: user.department,
+                    tasks: projectModal.tasks || [], 
+                    createdAt: serverTimestamp(), 
+                });
+            }
+            setProjectModal(null); 
+        } catch (error) {
+            console.error("Error saving project: ", error);
+            alert("Failed to save project. See console for details.");
+        }
     };
 
     const filteredProjects = filter === 'All' ? projects : projects.filter((p) => p.status === filter);
 
     return (
         <div className="flex min-h-screen bg-gray-100 relative">
-            {/* Sidebar */}
             <div
                 className={`fixed z-50 h-full transform transition-transform duration-300 bg-white ${
                     sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 } md:relative md:translate-x-0`}
             >
-                <Sidebar type="admin" />
+                <Sidebar type={user?.role || "employee"} />
             </div>
 
-            {/* Mobile overlay */}
             {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
 
-            {/* Main Content */}
             <div className="flex-1 p-4 md:p-6 lg:p-8">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                     <h1 className="text-3xl font-bold">Projects</h1>
                     <div className="flex items-center gap-2">
@@ -209,16 +185,18 @@ const ProjectsPage = () => {
                         >
                             <FaBars size={20} />
                         </button>
-                        <button
-                            onClick={() => setProjectModal({})}
-                            className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                        >
-                            <FaPlus /> Add Project
-                        </button>
+                        
+                        {isAdmin && (
+                            <button
+                                onClick={() => setProjectModal({})} 
+                                className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            >
+                                <FaPlus /> Add Project
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                {/* Filter */}
                 <div className="flex gap-2 mb-4 flex-wrap">
                     {['All', 'Ongoing', 'Completed', 'Pending'].map((status) => (
                         <button
@@ -233,24 +211,41 @@ const ProjectsPage = () => {
                     ))}
                 </div>
 
-                {/* Projects Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredProjects.map((project) => (
-                        <Card
-                            key={project.id}
-                            project={project}
-                            onView={(p) => setSelectedProject(p)}
-                            onEdit={(p) => setProjectModal({ ...p })}
-                        />
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className="flex justify-center items-center h-64">
+                        <FaSpinner className="animate-spin text-4xl text-gray-500" />
+                        <p className="ml-3 text-gray-600">Loading projects...</p>
+                    </div>
+                ) : filteredProjects.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredProjects.map((project) => (
+                            <Card
+                                key={project.id}
+                                project={project}
+                                onView={(p) => setSelectedProject(p)}
+                                onEdit={(p) => setProjectModal({ ...p })}
+                                isAdmin={isAdmin} 
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center h-64">
+                        <p className="text-gray-600">No projects found for this filter.</p>
+                    </div>
+                )}
 
-                {/* View/Edit Modals */}
+
                 {selectedProject && (
                     <ProjectViewModal project={selectedProject} onClose={() => setSelectedProject(null)} getChartData={getChartData} />
                 )}
+                
                 {projectModal && (
-                    <ProjectEditModal project={projectModal} onClose={() => setProjectModal(null)} onSave={handleSaveProject} setProjectModal={setProjectModal} />
+                    <ProjectEditModal 
+                        project={projectModal} 
+                        onClose={() => setProjectModal(null)} 
+                        onSave={handleSaveProject} 
+                        setProjectModal={setProjectModal} 
+                    />
                 )}
             </div>
         </div>
@@ -259,7 +254,6 @@ const ProjectsPage = () => {
 
 export default ProjectsPage;
 
-// ----------------- Separate Modals -----------------
 const ProjectViewModal = ({ project, onClose, getChartData }) => (
     <div
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -278,10 +272,15 @@ const ProjectViewModal = ({ project, onClose, getChartData }) => (
             <p className="text-gray-700 mb-1">{project.desc}</p>
             <p className="text-gray-600 mb-1">Members: {project.members}</p>
             <p className="text-gray-500 mb-3">
-                Duration: {project.startDate} - {project.endDate}
+                Duration: {project.startDate?.toDate ? project.startDate.toDate().toLocaleDateString() : project.startDate} - 
+                            {project.endDate?.toDate ? project.endDate.toDate().toLocaleDateString() : project.endDate}
             </p>
             <div className="mb-4">
-                <Doughnut data={getChartData(project)} />
+                {project.tasks && project.tasks.length > 0 ? (
+                    <Doughnut data={getChartData(project)} />
+                ) : (
+                    <p className="text-center text-gray-500">No task data to display.</p>
+                )}
             </div>
 
             <p className="text-sm font-semibold mb-1">Overall Progress:</p>
@@ -301,24 +300,28 @@ const ProjectViewModal = ({ project, onClose, getChartData }) => (
 
             <p className="text-sm font-semibold mb-2">Tasks:</p>
             <div className="overflow-x-auto mb-4">
-                <table className="w-full text-sm text-left border border-gray-300">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="px-2 py-1 border">Name</th>
-                            <th className="px-2 py-1 border">Status</th>
-                            <th className="px-2 py-1 border">Progress</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {project.tasks.map((task) => (
-                            <tr key={task.id} className="border-t">
-                                <td className="px-2 py-1 border">{task.name}</td>
-                                <td className="px-2 py-1 border">{task.status}</td>
-                                <td className="px-2 py-1 border">{task.progress}%</td>
+                {project.tasks && project.tasks.length > 0 ? (
+                    <table className="w-full text-sm text-left border border-gray-300">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="px-2 py-1 border">Name</th>
+                                <th className="px-2 py-1 border">Status</th>
+                                <th className="px-2 py-1 border">Progress</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {project.tasks.map((task) => (
+                                <tr key={task.id} className="border-t">
+                                    <td className="px-2 py-1 border">{task.name}</td>
+                                    <td className="px-2 py-1 border">{task.status}</td>
+                                    <td className="px-2 py-1 border">{task.progress}%</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                     <p className="text-center text-gray-500">No tasks have been added to this project yet.</p>
+                )}
             </div>
 
             <button
@@ -395,7 +398,8 @@ const ProjectEditModal = ({ project, onClose, onSave, setProjectModal }) => (
             <input
                 type="date"
                 className="w-full mb-3 border rounded p-2"
-                value={project.startDate || ''}
+                // Handle both string (from input) and Firestore Timestamp (from db)
+                value={project.startDate?.toDate ? project.startDate.toDate().toISOString().split('T')[0] : project.startDate || ''}
                 onChange={(e) => setProjectModal({ ...project, startDate: e.target.value })}
                 required
             />
@@ -404,7 +408,7 @@ const ProjectEditModal = ({ project, onClose, onSave, setProjectModal }) => (
             <input
                 type="date"
                 className="w-full mb-3 border rounded p-2"
-                value={project.endDate || ''}
+                value={project.endDate?.toDate ? project.endDate.toDate().toISOString().split('T')[0] : project.endDate || ''}
                 onChange={(e) => setProjectModal({ ...project, endDate: e.target.value })}
                 required
             />

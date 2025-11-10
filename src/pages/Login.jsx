@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/userContext";
 import { db } from "../context/firebase";
 import { doc, getDoc } from "@firebase/firestore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
 import "../styles/login.css";
 import { useNavigate } from "react-router";
 
@@ -44,6 +44,8 @@ const LoginPage = () => {
                 handleCaptchaRefresh();
                 return;
             }
+
+            await setPersistence(auth, browserLocalPersistence);
 
             const userCredential = await signInWithEmailAndPassword(
                 auth,

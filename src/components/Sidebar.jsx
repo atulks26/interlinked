@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import ProfileImg from "../images/profile.png";
+import { UserContext } from "../context/userContext";
 import {
   FaUsers,
   FaTasks,
@@ -10,10 +11,14 @@ import {
   FaBars,
   FaTimes,
   FaHome,
+  FaUserAlt,
 } from "react-icons/fa";
 
-// --------------------------- AdminSidebar Component ---------------------------
-const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
+const Sidebar = ({ type = "admin", handleLogout }) => {
+  const { user } = useContext(UserContext); 
+  const [isOpen, setIsOpen] = React.useState(true); 
+  const toggleSidebar = () => setIsOpen(!isOpen);
+
   const capitalizeWords = (str) => {
     if (!str) return "";
     return str
@@ -26,7 +31,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
 
   const userDepartment = capitalizeWords(user?.department);
 
-  const navGroups = [
+  const adminNavGroups = [
     {
       title: "Main",
       options: [
@@ -60,24 +65,60 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
     {
       title: "Communicate",
       options: [
-        // {
-        //   name: "Intra-department Forum",
-        //   path: `/dashboard/${user?.department}/department-forum`,
-        //   icon: <FaShareAlt />,
-        // },
         {
           name: "Department Forum",
           path: `/dashboard/admin/${user?.department}/${user?.userId}/inter-department-forum`,
           icon: <FaShareAlt />,
         },
-        // {
-        //   name: "Resource Sharing",
-        //   path: `/resource-sharing`,
-        //   icon: <FaShareAlt />,
-        // },
       ],
     },
   ];
+
+  const employeeNavGroups = [
+    {
+      title: "Main",
+      options: [
+        {
+          name: "Home",
+          path: `/dashboard/junior-officer/${user?.department}/${user?.userId}`,
+          icon: <FaHome />,
+        },
+        {
+          name: "My Profile",
+          path: `/dashboard/junior-officer/${user?.department}/${user?.userId}/profile`,
+          icon: <FaUserAlt />,
+        },
+      ],
+    },
+    {
+      title: "Tools",
+      options: [
+        {
+          name: "Department Tasks",
+          path: `/dashboard/${user?.department}/tasks`,
+          icon: <FaTasks />,
+        },
+        {
+          name: "Projects Page",
+          path: `/projectspage`,
+          icon: <FaProjectDiagram />,
+        },
+      ],
+    },
+    {
+      title: "Communicate",
+      options: [
+        {
+          name: "Department Forum",
+          path: `/dashboard/admin/${user?.department}/${user?.userId}/inter-department-forum`,
+          icon: <FaShareAlt />,
+        },
+      ],
+    },
+  ];
+
+  const navGroups = type === "admin" ? adminNavGroups : employeeNavGroups;
+  const userRole = type === "admin" ? "Administrator" : "Junior Officer";
 
   const activeLinkStyle = "bg-gray-700 text-white";
   const inactiveLinkStyle = "text-gray-300 hover:bg-gray-700 hover:text-white";
@@ -88,7 +129,6 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
         isOpen ? "w-64" : "w-20"
       } flex flex-col min-h-screen flex-shrink-0 relative`}
     >
-      {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
         className={`p-2 rounded-md text-gray-300 hover:bg-gray-700 transition-all mb-4 ${
@@ -98,7 +138,6 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      {/* Profile Section */}
       <div
         className={`flex flex-col mb-4 pb-4 border-b border-gray-700 ${
           isOpen ? "items-start" : "items-center"
@@ -116,13 +155,12 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
             <h1 className="text-xl font-bold text-yellow-400">
               {user?.user_name}
             </h1>
-            <p className="text-sm text-gray-400">Administrator</p>
+            <p className="text-sm text-gray-400">{userRole}</p>
             <p className="text-xs text-gray-500">{userDepartment}</p>
           </div>
         )}
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1">
         {navGroups.map((group, index) => (
           <div key={index} className="mb-2">
@@ -136,7 +174,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
                 <li key={opt.name} className="relative group">
                   <NavLink
                     to={opt.path}
-                    end={opt.name === "Home"} // ✅ ensures only Home matches exactly
+                    end={opt.name === "Home"}
                     className={({ isActive }) =>
                       `flex items-center gap-3 p-2 rounded-md transition-colors ${
                         isActive ? activeLinkStyle : inactiveLinkStyle
@@ -177,4 +215,4 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
   );
 };
 
-export default AdminSidebar;
+export default Sidebar;
