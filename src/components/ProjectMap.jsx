@@ -11,8 +11,8 @@ import React, { useEffect, useRef, useState } from "react";
  * Replace API_KEY if needed.
  */
 
-const API_KEY = "AIzaSyA5WxrXeGam8p88Dmj4c_GQJcVOu6mUplU";
-const SCRIPT_URL = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places`;
+// const API_KEY = "AIzaSyA5WxrXeGam8p88Dmj4c_GQJcVOu6mUplU";
+const SCRIPT_URL = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAP_API}&libraries=places`;
 
 const DEPARTMENTS = [
   { key: "water", label: "Water", color: "#00A86B" },
