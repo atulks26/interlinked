@@ -12,6 +12,7 @@ import {
   FaHome,
 } from "react-icons/fa";
 
+// --------------------------- AdminSidebar Component ---------------------------
 const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
   const capitalizeWords = (str) => {
     if (!str) return "";
@@ -57,38 +58,35 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
       ],
     },
     {
-  title: "Communicate",
-  options: [
-    {
-      name: "Intra-Department Forum",
-      path: user?.department
-        ? `/dashboard/${user.department}/department-forum`
-        : "#",
-      icon: <FaShareAlt />,
+      title: "Communicate",
+      options: [
+        // {
+        //   name: "Intra-department Forum",
+        //   path: `/dashboard/${user?.department}/department-forum`,
+        //   icon: <FaShareAlt />,
+        // },
+        {
+          name: "Department Forum",
+          path: `/dashboard/admin/${user?.department}/${user?.userId}/inter-department-forum`,
+          icon: <FaShareAlt />,
+        },
+        // {
+        //   name: "Resource Sharing",
+        //   path: `/resource-sharing`,
+        //   icon: <FaShareAlt />,
+        // },
+      ],
     },
-    {
-      name: "Inter-Department Forum",
-      path: "/inter-department-forum",
-      icon: <FaShareAlt />,
-    },
-    {
-      name: "Resource Sharing",
-      path: "/resource-sharing",
-      icon: <FaShareAlt />,
-    },
-  ],
-},
-];
+  ];
 
   const activeLinkStyle = "bg-gray-700 text-white";
-  const inactiveLinkStyle =
-    "text-gray-300 hover:bg-gray-700 hover:text-white transition-all";
+  const inactiveLinkStyle = "text-gray-300 hover:bg-gray-700 hover:text-white";
 
   return (
     <div
       className={`bg-gray-800 text-white p-4 transition-all duration-300 ${
         isOpen ? "w-64" : "w-20"
-      } flex flex-col min-h-screen flex-shrink-0 relative shadow-lg`}
+      } flex flex-col min-h-screen flex-shrink-0 relative`}
     >
       {/* Toggle Button */}
       <button
@@ -102,7 +100,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
 
       {/* Profile Section */}
       <div
-        className={`flex flex-col mb-6 pb-4 border-b border-gray-700 ${
+        className={`flex flex-col mb-4 pb-4 border-b border-gray-700 ${
           isOpen ? "items-start" : "items-center"
         }`}
       >
@@ -111,12 +109,12 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
           alt="Profile"
           className={`rounded-full ${
             isOpen ? "w-16 h-16" : "w-10 h-10"
-          } transition-all shadow-md`}
+          } transition-all`}
         />
         {isOpen && (
           <div className="mt-2">
-            <h1 className="text-lg font-bold text-yellow-400 leading-tight">
-              {user?.user_name || "Admin User"}
+            <h1 className="text-xl font-bold text-yellow-400">
+              {user?.user_name}
             </h1>
             <p className="text-sm text-gray-400">Administrator</p>
             <p className="text-xs text-gray-500">{userDepartment}</p>
@@ -125,9 +123,9 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
+      <nav className="flex-1">
         {navGroups.map((group, index) => (
-          <div key={index} className="mb-4">
+          <div key={index} className="mb-2">
             {isOpen && (
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
                 {group.title}
@@ -138,16 +136,15 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
                 <li key={opt.name} className="relative group">
                   <NavLink
                     to={opt.path}
+                    end={opt.name === "Home"} // ✅ ensures only Home matches exactly
                     className={({ isActive }) =>
-                      `flex items-center gap-3 p-2 rounded-md transition-all ${
+                      `flex items-center gap-3 p-2 rounded-md transition-colors ${
                         isActive ? activeLinkStyle : inactiveLinkStyle
                       } ${!isOpen ? "justify-center" : ""}`
                     }
                   >
-                    <span className="text-lg">{opt.icon}</span>
-                    {isOpen && (
-                      <span className="truncate text-sm">{opt.name}</span>
-                    )}
+                    <span className="text-xl">{opt.icon}</span>
+                    {isOpen && <span>{opt.name}</span>}
                   </NavLink>
 
                   {!isOpen && (
@@ -166,14 +163,14 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
       <div className="mt-auto pt-4 border-t border-gray-700">
         <button
           onClick={handleLogout}
-          className={`flex items-center gap-3 p-2 rounded-md w-full transition-all text-red-400 hover:bg-red-900 hover:text-white ${
+          className={`flex items-center gap-3 p-2 rounded-md w-full transition-colors text-red-400 hover:bg-red-900 hover:text-white ${
             !isOpen ? "justify-center" : ""
           }`}
         >
           <span className="text-xl">
             <FaSignOutAlt />
           </span>
-          {isOpen && <span className="font-semibold">LOGOUT</span>}
+          {isOpen && <span className="font-bold">LOGOUT</span>}
         </button>
       </div>
     </div>
