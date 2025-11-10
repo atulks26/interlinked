@@ -288,7 +288,7 @@ const AdminDashboard = () => {
     { id: 5, title: "Finalize Budget", desc: "Finalize Q4 budget", progress: 90, status: 'completed' },
   ];
 
-  const mockEmployees = ["Priyanshu", "Atul", "Ankur", "Nehal", "Garv", "Sonia", "Rahul"];
+  const mockEmployees = ["Priyanshu", "Anushka" , "Atul", "Ankur", "Nehal", "Garv", "Sonia", "Rahul"];
 
   const mockActivity = [
     { id: 1, user: 'Priyanshu', action: 'completed', target: 'Prepare Report', time: '2 hours ago' },
