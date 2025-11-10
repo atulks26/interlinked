@@ -18,6 +18,7 @@ import {
   FaTimesCircle,
   FaCheckCircle,
   FaCommentDots,
+  FaHome
 } from "react-icons/fa";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -173,8 +174,16 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
     if (!str) return "";
     return str.toLowerCase().replace(/-/g, " ").split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
   };
+
   const userDepartment = capitalizeWords(user?.department);
+
   const navGroups = [
+    {
+      title: "Main",
+      options: [
+        { name: "Home", path: `/dashboard/admin/${user?.department}/${user?.userId}`, icon: <FaHome /> },
+      ]
+    },
     {
       title: "Tools",
       options: [
@@ -186,12 +195,13 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
     {
       title: "Communicate",
       options: [
-        { name: "Intra-department Forum", path: `/dashboard/${user?.department}/department-forum`, icon: <FaShareAlt /> },
-        { name: "Inter-department Forum", path: `/inter-department-forum`, icon: <FaShareAlt /> },
-        { name: "Resource Sharing", path: `/resource-sharing`, icon: <FaShareAlt /> },
+        // { name: "Intra-department Forum", path: `/dashboard/${user?.department}/department-forum`, icon: <FaShareAlt /> },
+        { name: "Department Forum", path: `/dashboard/admin/${user?.department}/${user?.userId}/inter-department-forum`, icon: <FaShareAlt /> },
+        // { name: "Resource Sharing", path: `/resource-sharing`, icon: <FaShareAlt /> },
       ]
     }
   ];
+
   const activeLinkStyle = "bg-gray-700 text-white";
   const inactiveLinkStyle = "text-gray-300 hover:bg-gray-700 hover:text-white";
 
@@ -200,6 +210,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
       <button onClick={toggleSidebar} className={`p-2 rounded-md text-gray-300 hover:bg-gray-700 transition-all mb-4 ${isOpen ? "self-end" : "self-center"}`}>
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
+
       <div className={`flex flex-col mb-4 pb-4 border-b border-gray-700 ${isOpen ? "items-start" : "items-center"}`}>
         <img src={ProfileImg} alt="Profile" className={`rounded-full ${isOpen ? 'w-16 h-16' : 'w-10 h-10'} transition-all`} />
         {isOpen && (
@@ -210,6 +221,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
           </div>
         )}
       </div>
+
       <nav className="flex-1">
         {navGroups.map((group, index) => (
           <div key={index} className="mb-2">
@@ -217,7 +229,13 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
             <ul className="flex flex-col gap-1">
               {group.options.map((opt) => (
                 <li key={opt.name} className="relative group"> 
-                  <NavLink to={opt.path} className={({ isActive }) => `flex items-center gap-3 p-2 rounded-md transition-colors ${isActive ? activeLinkStyle : inactiveLinkStyle} ${!isOpen ? "justify-center" : ""}`}>
+                  <NavLink
+                    to={opt.path}
+                    end={opt.name === "Home"}  // ✅ Only "Home" uses exact match
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 p-2 rounded-md transition-colors ${isActive ? activeLinkStyle : inactiveLinkStyle} ${!isOpen ? "justify-center" : ""}`
+                    }
+                  >
                     <span className="text-xl">{opt.icon}</span>
                     {isOpen && <span>{opt.name}</span>}
                   </NavLink>
@@ -232,6 +250,7 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
           </div>
         ))}
       </nav>
+
       <div className="mt-auto pt-4 border-t border-gray-700">
         <button onClick={handleLogout} className={`flex items-center gap-3 p-2 rounded-md w-full transition-colors text-red-400 hover:bg-red-900 hover:text-white ${!isOpen ? "justify-center" : ""}`}>
           <span className="text-xl"><FaSignOutAlt /></span>

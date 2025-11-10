@@ -20,18 +20,19 @@ const ManageJunior = () => {
 
   // Mock data
   const [employees, setEmployees] = useState([
-    { id: 1, name: "Priyanshu", department: "Finance" },
-    { id: 2, name: "Atul", department: "HR" },
-    { id: 3, name: "Ankur", department: "IT" },
-    { id: 4, name: "Nehal", department: "Operations" },
-    { id: 5, name: "Garv", department: "Finance" },
-    { id: 6, name: "Sonia", department: "HR" },
-    { id: 7, name: "Rahul", department: "IT" },
+    { id: 1, name: "Priyanshu", subdepartment: "Finance", email: "priyanshu@company.com" },
+    { id: 2, name: "Atul", subdepartment: "HR", email: "atul@company.com" },
+    { id: 3, name: "Ankur", subdepartment: "IT", email: "ankur@company.com" },
   ]);
 
   // Filtering and sorting
   const filteredEmployees = employees
-    .filter((e) => e.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(
+      (e) =>
+        e.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        e.subdepartment.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        e.email.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .sort((a, b) =>
       sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
     );
@@ -40,9 +41,14 @@ const ManageJunior = () => {
   const handleAddOfficer = (e) => {
     e.preventDefault();
     const name = e.target.name.value.trim();
-    const department = e.target.department.value.trim();
-    if (name && department) {
-      setEmployees([...employees, { id: Date.now(), name, department }]);
+    const subdepartment = e.target.subdepartment.value.trim();
+    const email = e.target.email.value.trim();
+
+    if (name && subdepartment && email) {
+      setEmployees([
+        ...employees,
+        { id: Date.now(), name, subdepartment, email },
+      ]);
       setShowAddModal(false);
       e.target.reset();
     }
@@ -55,7 +61,8 @@ const ManageJunior = () => {
         ? {
             ...emp,
             name: e.target.name.value,
-            department: e.target.department.value,
+            subdepartment: e.target.subdepartment.value,
+            email: e.target.email.value,
           }
         : emp
     );
@@ -74,7 +81,7 @@ const ManageJunior = () => {
       <Sidebar type="admin" />
 
       {/* ✅ Main Content */}
-      <div className="container mx-auto p-4 flex-1">
+      <div className="container mx-auto p-6 flex-1">
         <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
           <h1 className="text-3xl font-bold">Manage Junior Officers</h1>
 
@@ -124,8 +131,14 @@ const ManageJunior = () => {
                 alt={emp.name}
                 className="w-16 h-16 rounded-full"
               />
-              <h2 className="font-semibold">{emp.name}</h2>
-              <p className="text-sm text-gray-500">{emp.department}</p>
+              <h2 className="font-semibold text-lg">{emp.name}</h2>
+              <p className="text-sm text-gray-500">
+                <strong>Sub-department:</strong> {emp.subdepartment}
+              </p>
+              <p className="text-sm text-gray-500">
+                <strong>Email:</strong> {emp.email}
+              </p>
+
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => {
@@ -170,8 +183,15 @@ const ManageJunior = () => {
               className="w-full mb-3 border rounded p-2"
             />
             <input
-              name="department"
-              placeholder="Department"
+              name="subdepartment"
+              placeholder="Sub-department"
+              required
+              className="w-full mb-3 border rounded p-2"
+            />
+            <input
+              name="email"
+              placeholder="Email ID"
+              type="email"
               required
               className="w-full mb-3 border rounded p-2"
             />
@@ -213,8 +233,15 @@ const ManageJunior = () => {
               className="w-full mb-3 border rounded p-2"
             />
             <input
-              name="department"
-              defaultValue={selectedOfficer.department}
+              name="subdepartment"
+              defaultValue={selectedOfficer.subdepartment}
+              required
+              className="w-full mb-3 border rounded p-2"
+            />
+            <input
+              name="email"
+              defaultValue={selectedOfficer.email}
+              type="email"
               required
               className="w-full mb-3 border rounded p-2"
             />

@@ -78,7 +78,7 @@ function App() {
 
                     {/* ✅ Inter-Department Forum */}
                     <Route
-                        path="/inter-department-forum"
+                        path="/dashboard/admin/:department/:id/inter-department-forum"
                         element={<InterDepartmentForum user={user} handleLogout={handleLogout} />}
                     />
 
