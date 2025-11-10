@@ -12,7 +12,7 @@ import React, { useEffect, useRef, useState } from "react";
  */
 
 // const API_KEY = "AIzaSyA5WxrXeGam8p88Dmj4c_GQJcVOu6mUplU";
-const SCRIPT_URL = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAP_API}&libraries=places`;
+const SCRIPT_URL = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_PLACES_API}&libraries=places`;
 
 const DEPARTMENTS = [
   { key: "water", label: "Water", color: "#00A86B" },
@@ -875,8 +875,8 @@ export default function GoogleMapComponent() {
       const polygon = new window.google.maps.Polygon({
         paths: p.coords,
         strokeColor: dept.color,
-        strokeOpacity: 0.9,
-        strokeWeight: 1.5,
+        strokeOpacity: 1,
+        strokeWeight: 4,
         fillColor: dept.color,
         fillOpacity: 0.35,
       });
