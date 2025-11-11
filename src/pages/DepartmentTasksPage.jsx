@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/userContext";
 import Sidebar from "../components/Sidebar";
 import {
@@ -26,7 +26,6 @@ import { useNavigate } from "react-router-dom";
 
 Chart.register(ArcElement, Tooltip, Legend);
 
-// ---------------- Chart Component (Unchanged) ----------------
 const TaskChart = ({ tasks }) => {
     const statusCounts = {
         pending: tasks.filter((t) => t.status === "pending").length,
@@ -63,7 +62,6 @@ const TaskChart = ({ tasks }) => {
     );
 };
 
-// ---------------- Task Modal (Unchanged) ----------------
 const TaskModal = ({ task, onClose, onSave }) => {
     const [title, setTitle] = useState(task?.title || "");
     const [desc, setDesc] = useState(task?.desc || "");
@@ -140,7 +138,6 @@ const TaskModal = ({ task, onClose, onSave }) => {
     );
 };
 
-// ---------------- Stat Card (Unchanged) ----------------
 const StatCard = ({ title, value, icon, color, onClick }) => (
     <div className={`bg-white rounded-lg shadow p-4 flex items-center gap-4 cursor-pointer hover:shadow-md transition`} onClick={onClick}>
         <div className={`text-3xl p-3 rounded-full ${color}`}>{icon}</div>
@@ -151,7 +148,6 @@ const StatCard = ({ title, value, icon, color, onClick }) => (
     </div>
 );
 
-// ---------------- Task Card (Updated) ----------------
 const TaskCard = ({ task, onEdit }) => (
     <div className="flex flex-col border-2 border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-lg transition">
         <div className="flex justify-between items-start gap-4 flex-wrap">
@@ -159,7 +155,7 @@ const TaskCard = ({ task, onEdit }) => (
                 <div className="text-lg font-semibold">{task.title}</div>
                 <div className="text-gray-600 text-sm">{task.desc}</div>
             </div>
-            {/* Show edit button only if user is admin */}
+
             {task.role === 'admin' && (
                 <button
                     onClick={() => onEdit(task)}
@@ -187,7 +183,6 @@ const TaskCard = ({ task, onEdit }) => (
     </div>
 );
 
-// ---------------- Main Page ----------------
 const DepartmentTasksPage = () => {
     const { user, setUser } = useContext(UserContext); 
     const navigate = useNavigate(); 
@@ -206,7 +201,6 @@ const DepartmentTasksPage = () => {
         navigate("/");
     };
 
-    // --- NEW: Activity Logger Function ---
     const logActivity = async (action, target_name, target_id = null) => {
         if (!user || !user.department) return;
         try {
@@ -224,7 +218,6 @@ const DepartmentTasksPage = () => {
         }
     };
 
-    // --- FETCH TASKS FROM FIRESTORE ---
     useEffect(() => {
         if (!user || !user.department) {
             setIsLoading(true); 
@@ -251,7 +244,6 @@ const DepartmentTasksPage = () => {
         return () => unsubscribe(); 
     }, [user, userRole]); 
 
-    // --- ADD/EDIT TASK IN FIRESTORE (Updated to log) ---
     const handleAddOrEditTask = async (taskDataFromModal) => {
         const authorId = user?.userId;
         if (!authorId || !user?.department) {
@@ -262,7 +254,7 @@ const DepartmentTasksPage = () => {
         const tasksColRef = collection(db, "departments", user.department, "tasks");
 
         try {
-            if (taskDataFromModal.id) { // Editing
+            if (taskDataFromModal.id) {
                 const taskRef = doc(db, "departments", user.department, "tasks", taskDataFromModal.id);
                 await updateDoc(taskRef, {
                     title: taskDataFromModal.title,
@@ -272,10 +264,10 @@ const DepartmentTasksPage = () => {
                     updatedAt: serverTimestamp(),
                     updatedBy: authorId
                 });
-                // --- Log Activity ---
+
                 await logActivity("updated_task", taskDataFromModal.title, taskDataFromModal.id);
 
-            } else { // Adding
+            } else {
                 const docRef = await addDoc(tasksColRef, {
                     ...taskDataFromModal,
                     authorId: authorId,
@@ -284,7 +276,6 @@ const DepartmentTasksPage = () => {
                     updatedAt: serverTimestamp(),
                     department: user.department
                 });
-                // --- Log Activity ---
                 await logActivity("created_task", taskDataFromModal.title, docRef.id);
             }
             setShowModal(false);
@@ -302,7 +293,6 @@ const DepartmentTasksPage = () => {
             <Sidebar type={userRole} handleLogout={handleLogout} />
 
             <main className="flex-1 p-4 md:p-8">
-                {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <div className="flex items-center gap-3">
                         <div>

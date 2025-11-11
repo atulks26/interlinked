@@ -86,8 +86,6 @@ const TaskChart = ({ tasks }) => {
   return <div className="max-w-[250px] mx-auto mb-4"><Doughnut data={data} options={options} /></div>;
 };
 
-
-// ---------------- Task Modal (Unchanged) ----------------
 const TaskModal = ({ task, onClose, onSave }) => {
   const [title, setTitle] = useState(task?.title || "");
   const [desc, setDesc] = useState(task?.desc || "");
@@ -561,7 +559,6 @@ const AdminSidebar = ({ user, handleLogout, isOpen, toggleSidebar }) => {
         </div>
       )}
       
-      {/* Add/Edit Task Modal */}
       {showTaskModal && (
         <TaskModal
           task={editingTask || {}}

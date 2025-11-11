@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userContext";
-import Sidebar from "../components/Sidebar"; // The universal sidebar
+import Sidebar from "../components/Sidebar";
 import ProfileImg from "../images/profile.png";
 import {
   FaUsers,
@@ -11,8 +11,7 @@ import {
   FaExclamationTriangle,
   FaTimesCircle,
   FaCheckCircle,
-  FaCommentDots,
-  FaPlus // Import FaPlus
+  FaPlus
 } from "react-icons/fa";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -21,18 +20,16 @@ import {
   collection,
   query,
   onSnapshot,
-  doc,
   orderBy,
-  limit // Import limit
+  limit
 } from "firebase/firestore"; 
 
 Chart.register(ArcElement, Tooltip, Legend);
 
-// --- START: Time Ago Helper Function ---
 const formatTimeAgo = (timestamp) => {
     if (!timestamp) return 'Just now';
     const now = new Date();
-    const date = timestamp.toDate(); // Convert Firestore Timestamp to JS Date
+    const date = timestamp.toDate();
     const seconds = Math.floor((now - date) / 1000);
 
     let interval = seconds / 31536000;
@@ -47,9 +44,7 @@ const formatTimeAgo = (timestamp) => {
     if (interval > 1) return Math.floor(interval) + "m ago";
     return Math.floor(seconds) + "s ago";
 };
-// --- END: Time Ago Helper Function ---
 
-// --------------------------- TaskChart Component (Copied from Admin) ---------------------------
 const TaskChart = ({ tasks }) => {
   const statusCounts = {
     pending: tasks.filter(t => t.status === 'pending').length,
@@ -79,7 +74,6 @@ const TaskChart = ({ tasks }) => {
   return <div className="max-w-[250px] mx-auto mb-4"><Doughnut data={data} options={options} /></div>;
 };
 
-// --------------------------- StatCard Component (Copied from Admin) ---------------------------
 const StatCard = ({ title, value, icon, color, onClick }) => (
   <div className={`bg-white rounded-lg shadow p-4 flex items-center gap-4 ${onClick ? 'cursor-pointer hover:shadow-md' : ''}`} onClick={onClick}>
     <div className={`text-3xl p-3 rounded-full ${color}`}>
@@ -92,7 +86,6 @@ const StatCard = ({ title, value, icon, color, onClick }) => (
   </div>
 );
 
-// --------------------------- TaskItem Component (Copied from Admin) ---------------------------
 const TaskItem = ({ task, onOpen }) => (
   <div className="flex flex-col border-2 border-gray-200 rounded-lg shadow-sm p-4 bg-white hover:shadow-lg transition-shadow">
     <div className="flex justify-between items-start gap-4 flex-wrap">
@@ -114,7 +107,6 @@ const TaskItem = ({ task, onOpen }) => (
   </div>
 );
 
-// --------------------------- UserProfileCard Component (Request #6) ---------------------------
 const UserProfileCard = ({ user }) => {
     const capitalizeWords = (str) => {
         if (!str) return 'N/A';
@@ -151,7 +143,6 @@ const UserProfileCard = ({ user }) => {
     );
 };
 
-// --------------------------- ActivityFeedItem Component (Updated) ---------------------------
 const ActivityFeedItem = ({ activity }) => {
   const { user_name, action, target_name, timestamp } = activity; 
   
@@ -186,7 +177,6 @@ const ActivityFeedItem = ({ activity }) => {
   );
 };
 
-// --------------------------- EmployeeDashboard Component ---------------------------
 const EmployeeDashboard = () => {
     const { user, setUser } = useContext(UserContext);
     const navigate = useNavigate();
@@ -197,7 +187,6 @@ const EmployeeDashboard = () => {
     const [selectedTask, setSelectedTask] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // --- NEW: Real activity state ---
     const [activities, setActivities] = useState([]); 
 
     const handleLogout = () => {
@@ -208,7 +197,6 @@ const EmployeeDashboard = () => {
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-    // --- Combined useEffect for all data fetching ---
     useEffect(() => {
         if (!user || !user.department) {
             setIsLoading(true);
@@ -218,25 +206,22 @@ const EmployeeDashboard = () => {
         setIsLoading(true);
         const department = user.department;
 
-        // 1. Fetch Tasks
         const tasksRef = collection(db, "departments", department, "tasks");
         const qTasks = query(tasksRef, orderBy("createdAt", "desc"));
         const unsubTasks = onSnapshot(qTasks, (snapshot) => {
             setTasks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         }, (error) => console.error("Error fetching tasks: ", error));
 
-        // 2. Fetch Activities (NEW)
         const activitiesRef = collection(db, "departments", department, "activities");
         const qActivities = query(activitiesRef, orderBy("timestamp", "desc"), limit(10));
         const unsubActivities = onSnapshot(qActivities, (snapshot) => {
             setActivities(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-            setIsLoading(false); // Set loading to false after last query
+            setIsLoading(false);
         }, (error) => {
             console.error("Error fetching activities: ", error);
             setIsLoading(false);
         });
 
-        // Cleanup all listeners
         return () => {
             unsubTasks();
             unsubActivities();
@@ -261,7 +246,6 @@ const EmployeeDashboard = () => {
                     </div>
                 </div>
 
-                {/* --- Show loader while fetching --- */}
                 {isLoading ? (
                     <div className="flex justify-center items-center h-64">
                         <FaSpinner className="animate-spin text-4xl text-gray-500" />
@@ -314,7 +298,6 @@ const EmployeeDashboard = () => {
                 )}
             </div>
 
-            {/* View Task Modal */}
             {selectedTask && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center p-4">
                     <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-lg relative">

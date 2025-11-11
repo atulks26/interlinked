@@ -1,6 +1,4 @@
 import { React, useState } from "react";
-
-// 🖼 Your provided data (unchanged thumbnails)
 const videoData = {
   seminars: [
     {
@@ -134,7 +132,6 @@ const videoData = {
   ],
 };
 
-// 🎞 Video card
 const VideoCard = ({ title, thumbnail }) => (
   <div className="w-60 sm:w-72 flex-shrink-0 transition-transform transform hover:scale-105 cursor-pointer">
     <img
@@ -146,7 +143,6 @@ const VideoCard = ({ title, thumbnail }) => (
   </div>
 );
 
-// 🎥 Section for each category
 const Section = ({ heading, videos }) => (
   <div className="mb-12">
     <h2 className="text-2xl font-bold mt-2 mb-6 text-blue-900">{heading}</h2>
@@ -160,7 +156,6 @@ const Section = ({ heading, videos }) => (
   </div>
 );
 
-// 🧠 Main component
 const Training = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -175,7 +170,6 @@ const Training = () => {
 
   return (
     <div className="container mx-auto px-6 sm:px-10 py-10">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6">
         <h1 className="text-4xl font-bold text-blue-800 text-center sm:text-left">
           Training Programs
@@ -194,7 +188,6 @@ const Training = () => {
         </div>
       </div>
 
-      {/* Sections */}
       <Section heading="Seminars" videos={filteredData.seminars} />
       <Section heading="Webinars" videos={filteredData.webinars} />
       <Section heading="Workshops" videos={filteredData.workshops} />
@@ -204,7 +197,6 @@ const Training = () => {
       />
       <Section heading="Recorded Sessions" videos={filteredData.recordings} />
 
-      {/* UX Improvement - Go Back */}
       <div className="text-center mt-16">
         <a
           href="/"

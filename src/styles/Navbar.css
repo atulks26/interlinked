@@ -1,4 +1,3 @@
-/* --- Base Navbar Styles --- */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -37,7 +36,6 @@
   transform: scale(1.05);
 }
 
-/* --- Nav Links --- */
 .navbar-links {
   display: flex;
   gap: 30px;
@@ -62,7 +60,6 @@
   color: #ffd700;
 }
 
-/* Underline animation */
 .navbar-links a::after,
 .dropdown-toggle::after {
   content: "";
@@ -81,7 +78,6 @@
   left: 0;
 }
 
-/* --- Dropdown Menu (Mega Menu) --- */
 .dropdown {
   position: relative;
   z-index: 1200;
@@ -131,7 +127,6 @@
   transform: translateX(5px);
 }
 
-/* --- CTA Button (Log In) --- */
 .navbar-online-services {
   background: #d50032;
   color: white;
@@ -148,7 +143,6 @@
   transform: scale(1.05);
 }
 
-/* --- Hamburger Menu --- */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -168,7 +162,6 @@
   transition: all 0.3s ease;
 }
 
-/* Hamburger active (cross animation) */
 .hamburger.active span:nth-child(1) {
   transform: translateY(8px) rotate(45deg);
 }
@@ -179,7 +172,6 @@
   transform: translateY(-8px) rotate(-45deg);
 }
 
-/* --- Mobile Responsiveness --- */
 @media (max-width: 992px) {
   .navbar {
     padding: 0 20px;
@@ -227,7 +219,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  /* Mobile Dropdown (open on click) */
   .dropdown-content {
     display: none;
     position: static;
@@ -255,7 +246,6 @@
     background-color: rgba(255, 255, 255, 0.15);
   }
 
-  /* ✅ Log In Button inside responsive menu */
   .navbar-online-services {
     width: 100%;
     text-align: center;
@@ -269,7 +259,6 @@
   }
 }
 
-/* --- Smooth Shadow on Scroll --- */
 @media (min-width: 768px) {
   .navbar.scrolled {
     background: rgba(0, 93, 163, 0.95);

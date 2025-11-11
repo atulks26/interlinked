@@ -1,21 +1,19 @@
-/* General Layout */
 .department-forum-page {
     display: flex;
     height: 100vh;
-    background-color: #F4F5F7; /* Light background */
+    background-color: #F4F5F7;
     overflow: hidden;
 }
 
-/* Sidebar Styling */
 .department-sidebar {
-    width: 260px; /* Slightly wider sidebar for better spacing */
-    background: linear-gradient(180deg, #3F0E40, #5A1F5F); /* Gradient for modern look */
+    width: 260px;
+    background: linear-gradient(180deg, #3F0E40, #5A1F5F);
     color: white;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .department-sidebar ul {
@@ -26,7 +24,7 @@
 }
 
 .department-sidebar li {
-    margin-bottom: 15px; /* Space between list items */
+    margin-bottom: 15px;
 }
 
 .department-sidebar a {
@@ -42,7 +40,6 @@
     text-decoration: underline;
 }
 
-/* Add Channel Icon Styling */
 .department-sidebar .add-channel {
     display: flex;
     align-items: center;
@@ -57,10 +54,9 @@
 
 .department-sidebar .add-channel:hover {
     color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.1); /* Subtle background on hover */
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Profile Section Styling */
 .profile-section {
     display: flex;
     align-items: center;
@@ -73,7 +69,7 @@
     height: 40px;
     border-radius: 50%;
     margin-right: 15px;
-    border: 2px solid white; /* White border around profile pic */
+    border: 2px solid white;
 }
 
 .profile-info h4 {
@@ -88,13 +84,11 @@
     color: #B0B0B0;
 }
 
-/* Icons Styling for Sidebar */
 .icon {
     margin-right: 12px;
-    font-size: 18px; /* Slightly larger icon size */
+    font-size: 18px;
 }
 
-/* Content Area Styling */
 .department-content {
     flex-grow: 1;
     display: flex;
@@ -104,7 +98,6 @@
     padding: 20px;
 }
 
-/* Header Styling */
 .department-header {
     background-color: #ffffff;
     border-bottom: 1px solid #EDEDED;
@@ -112,8 +105,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 12px; /* Softer rounded corners */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .header-left {
@@ -150,7 +143,6 @@
     color: #5A1F5F;
 }
 
-/* Message List Styling */
 .message-list {
     padding: 15px;
     flex-grow: 1;
@@ -158,17 +150,15 @@
     background-color: #FAFAFA;
 }
 
-/* Message Item Styling */
 .message-item {
     margin-bottom: 15px;
     padding: 15px;
     background-color: #FFFFFF;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Enhanced shadow */
-    font-size: 14px; /* Slightly larger font size */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
 }
 
-/* Message Meta Styling */
 .message-meta {
     display: flex;
     justify-content: space-between;
@@ -181,7 +171,6 @@
     color: #888;
 }
 
-/* Message Input Styling */
 .message-input {
     padding: 15px;
     border-top: 1px solid #EDEDED;
@@ -221,7 +210,6 @@
     background-color: #5A1F5F;
 }
 
-/* Connect Section Styling */
 .connect-section {
     margin-top: 20px;
 }
@@ -248,7 +236,6 @@
     font-size: 18px;
 }
 
-/* Replies Section Styling */
 .replies {
     margin-top: 15px;
     margin-left: 20px;

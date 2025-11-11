@@ -1,17 +1,5 @@
-// GoogleMapComponent.jsx
 import React, { useEffect, useRef, useState } from "react";
 
-/**
- * GoogleMapComponent
- * - 45 realistic irregular polygons across Delhi/NCR
- * - Departments: Water, Power, Transport, NDMC, PWD, Telecom, Housing
- * - Legend with toggles, search (Places + Geocoder fallback), single marker
- * - Mobile: search placed so full-screen button is not blocked
- *
- * Replace API_KEY if needed.
- */
-
-// const API_KEY = "AIzaSyA5WxrXeGam8p88Dmj4c_GQJcVOu6mUplU";
 const SCRIPT_URL = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_PLACES_API}&libraries=places`;
 
 const DEPARTMENTS = [
@@ -24,7 +12,6 @@ const DEPARTMENTS = [
   { key: "housing", label: "Housing", color: "#607D8B" },
 ];
 
-// Realistic-ish polygon dataset (45 items)
 const POLYGON_DATA = [
   {
     id: 1,
@@ -823,13 +810,12 @@ export default function GoogleMapComponent() {
   const inputRef = useRef(null);
   const [map, setMap] = useState(null);
   const [apiLoaded, setApiLoaded] = useState(false);
-  const [layers, setLayers] = useState({}); // deptKey -> [google.maps.Polygon]
+  const [layers, setLayers] = useState({});
   const [visible, setVisible] = useState(() =>
     DEPARTMENTS.reduce((acc, d) => ({ ...acc, [d.key]: true }), {})
   );
   const [searchMarker, setSearchMarker] = useState(null);
 
-  // load script
   useEffect(() => {
     if (window.google && window.google.maps) {
       setApiLoaded(true);
@@ -849,7 +835,6 @@ export default function GoogleMapComponent() {
     document.head.appendChild(s);
   }, []);
 
-  // init map + polygons
   useEffect(() => {
     if (!apiLoaded || !mapRef.current || map) return;
     if (!window.google || !window.google.maps) return;
@@ -866,7 +851,6 @@ export default function GoogleMapComponent() {
     const infoWindow = new window.google.maps.InfoWindow();
     const newLayers = {};
 
-    // create polygons grouped by department key
     DEPARTMENTS.forEach((d) => (newLayers[d.key] = []));
 
     POLYGON_DATA.forEach((p) => {
@@ -915,14 +899,12 @@ export default function GoogleMapComponent() {
 
     setLayers(newLayers);
 
-    // setup autocomplete (optional nice UX)
     if (inputRef.current && window.google.maps.places) {
       const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current);
       autocomplete.bindTo("bounds", gmap);
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (!place.geometry || !place.geometry.location) return;
-        // clear previous marker
         if (searchMarker) searchMarker.setMap(null);
         const m = new window.google.maps.Marker({
           map: gmap,
@@ -939,7 +921,6 @@ export default function GoogleMapComponent() {
     }
   }, [apiLoaded, mapRef, map]);
 
-  // toggle layer visibility
   const toggle = (key) => {
     const newState = !visible[key];
     setVisible((s) => ({ ...s, [key]: newState }));
@@ -947,13 +928,11 @@ export default function GoogleMapComponent() {
     layers[key].forEach((poly) => poly.setMap(newState ? map : null));
   };
 
-  // manual search (Places API textSearch with geocode fallback)
   const handleSearch = () => {
     if (!map || !inputRef.current) return;
     const q = inputRef.current.value.trim();
     if (!q) return;
 
-    // clear previous marker
     if (searchMarker) {
       searchMarker.setMap(null);
       setSearchMarker(null);
@@ -995,7 +974,6 @@ export default function GoogleMapComponent() {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
-      {/* Search - positioned near top-right but below fullscreen control on mobile */}
       <div style={{
         position: "absolute",
         top: 12,
@@ -1021,10 +999,8 @@ export default function GoogleMapComponent() {
         </button>
       </div>
 
-      {/* Map container */}
       <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
 
-      {/* Legend & filters bottom-right */}
       <div style={{
         position: "absolute",
         right: 12,

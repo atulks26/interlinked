@@ -33,7 +33,6 @@
   background-color: #1d4ed8;
 }
 
-/* Table */
 .forum-topic-list table {
   width: 100%;
   border-collapse: collapse;
@@ -54,7 +53,6 @@
   cursor: pointer;
 }
 
-/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -126,7 +124,6 @@
   background-color: #1d4ed8;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -145,7 +142,6 @@
   }
 }
 
-/* Topic Detail */
 .topic-detail {
   background: white;
   padding: 2rem;

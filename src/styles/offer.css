@@ -1,10 +1,9 @@
-/* Container styling */
 .w-full {
     width: 100%;
 }
 
 .max-w-5xl {
-    max-width: 1200px; /* Adjust the max-width as needed */
+    max-width: 1200px;
 }
 
 .bg-white {
@@ -24,7 +23,7 @@
 }
 
 .text-3xl {
-    font-size: 2rem; /* Adjust font size for heading */
+    font-size: 2rem;
 }
 
 .font-bold {
@@ -43,7 +42,6 @@
     position: relative;
 }
 
-/* Slider item styling */
 .flex-1 {
     flex: 1;
 }
@@ -64,14 +62,12 @@
     border-radius: 10px;
 }
 
-/* Image styling */
 img {
     max-width: 100%;
     height: auto;
-    border-radius: 8px; /* Add border-radius to images */
+    border-radius: 8px;
 }
 
-/* Navigation buttons */
 .p-2 {
     padding: 0.5rem;
 }
@@ -99,7 +95,6 @@ img {
     left: 0;
 }
 
-/* Navigation dots */
 .flex {
     display: flex;
 }
@@ -132,27 +127,24 @@ img {
     background-color: #d1d5db;
 }
 
-/* Slider transition */
 .transition-transform {
     transition: transform 0.5s ease;
 }
 
-/* Hover effect on slider items */
 .flex-1:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Expand size for slider */
 .w-full {
     width: 100%;
 }
 
 .h-full {
-    height: 400px; /* Adjust height as needed */
+    height: 400px;
 }
 
 @media (min-width: 768px) {
     .w-full {
-        width: 80%; /* Adjust width on larger screens */
+        width: 80%;
     }
 }

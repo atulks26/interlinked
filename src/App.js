@@ -3,27 +3,16 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Landing from "./pages/Landing";
-import WhatWeOffer from "./pages/Offers";
 import Forum from "./pages/forum";
-import TopicDetail from "./components/TopicDetail";
 import Projects from "./pages/Projects";
 import LoginPage from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
-import Department from "./pages/Department";
 import Training from "./pages/Training";
-import DepartmentForum from "./components/DepartmentForum"; // Intra-Department Forum
 import RegistrationForm from "./pages/Register";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import InterDepartmentForum from "./components/InterDepartmentForum";
-
 import ProjectsPage from "./components/ProjectsPage";
-import StatusPage from "./components/ProjectDetails";
-import OngoingStatusPage from "./components/OngoingStatusPage";
-import ProjectForm from './pages/ProjectForm';
-import ChatBotIframe from "./components/cahtbot";
-
-// Import ManageJunior
 import ManageJunior from "./pages/ManageJunior";
 import DepartmentTasksPage from "./pages/DepartmentTasksPage";
 
@@ -55,27 +44,17 @@ function App() {
                     <Route path="/training" element={<Training />} />
                     <Route path="/forum" element={<Forum />} />
                     <Route path="/projectspage" element={<ProjectsPage />} />
-                    {/* <Route path="/statuspage" element={<StatusPage />} /> */}
-                    <Route path="/forum/topic/:id" element={<TopicDetail />} />
                     <Route path="/register" element={<RegistrationForm />} />
 
-                    {/* ✅ Inter-Department Forum */}
                     <Route
                         path="/dashboard/admin/:department/:id/inter-department-forum"
                         element={<InterDepartmentForum/>}
                     />
-
-                    {/* <Route
-                        path="/statuspage"
-                        element={<OngoingStatusPage />}
-                    /> */}
-                    {/* <Route path="/project-form" element={<ProjectForm />} /> */}
                     <Route
                         path="/dashboard/junior-officer/:department/:id/profile"
                         element={<EmployeeProfile />}
                     />
                 </Routes>
-                <ChatBotIframe />
                 <Footer />
             </Router>
         </div>

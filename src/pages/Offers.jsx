@@ -64,19 +64,17 @@ const WhatWeOffer = () => {
         },
     ];
 
-    // ✅ Responsive slide count
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth < 640) setSlidesToShow(1); // Mobile
-            else if (window.innerWidth < 1024) setSlidesToShow(2); // Tablet
-            else setSlidesToShow(3); // Desktop
+            if (window.innerWidth < 640) setSlidesToShow(1);
+            else if (window.innerWidth < 1024) setSlidesToShow(2);
+            else setSlidesToShow(3);
         };
         handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // ✅ Infinite auto-slide every 4 seconds
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentIndex((prevIndex) => (prevIndex + 1) % offers.length);
@@ -84,7 +82,6 @@ const WhatWeOffer = () => {
         return () => clearInterval(interval);
     }, [offers.length]);
 
-    // ✅ Get the visible slides (wrap around for infinite loop)
     const getVisibleSlides = () => {
         const slides = [];
         for (let i = 0; i < slidesToShow; i++) {
@@ -98,7 +95,6 @@ const WhatWeOffer = () => {
             <h2 className="text-3xl font-bold mb-6 text-center">What We Offer</h2>
 
             <div className="relative w-full max-w-6xl bg-white shadow-lg rounded-lg overflow-hidden">
-                {/* Navigation Buttons */}
                 <div className="absolute inset-0 flex items-center justify-between px-2 sm:px-4 z-10">
                     <button
                         className="p-2 bg-gray-200 hover:bg-gray-300 rounded-full shadow"
@@ -121,7 +117,6 @@ const WhatWeOffer = () => {
                     </button>
                 </div>
 
-                {/* Slides */}
                 <div className="w-full flex justify-center items-center my-10 transition-transform duration-700 ease-in-out">
                     <div
                         className={`w-full flex flex-wrap sm:flex-nowrap justify-center items-center gap-4 px-4`}
@@ -148,7 +143,6 @@ const WhatWeOffer = () => {
                 </div>
             </div>
 
-            {/* Dots Navigation */}
             <div className="flex space-x-2 mt-4">
                 {offers.map((_, idx) => (
                     <button

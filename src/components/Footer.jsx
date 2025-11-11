@@ -26,7 +26,6 @@ const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
-        {/* Logo Row */}
         <div className="footer-logos">
           {[logo1, logo2, logo3, logo4, logo5].map((logo, index) => (
             <img key={index} src={logo} alt={`Logo ${index + 1}`} className="footer-logo" />
@@ -35,16 +34,13 @@ const Footer = () => {
 
         <hr className="footer-divider" />
 
-        {/* Footer Info */}
         <div className="footer-content">
-          {/* Left */}
           <div className="footer-section">
             <h4>Visitor Info</h4>
             <p>Visitor No. <strong>{visitorCount}</strong></p>
             <p>Last Updated: {lastUpdated}</p>
           </div>
 
-          {/* Middle */}
           <div className="footer-section center">
             <h4>About</h4>
             <p>Website Content Managed by <strong>Interlinked</strong></p>
@@ -53,7 +49,6 @@ const Footer = () => {
             <p>Compatible Browsers: Chrome, Firefox, Edge, Safari</p>
           </div>
 
-          {/* Right */}
           <div className="footer-section">
             <h4>Contact</h4>
             <p>Toll-Free: 1800-123-4567</p>

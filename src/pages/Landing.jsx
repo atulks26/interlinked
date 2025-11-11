@@ -1,11 +1,9 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import WhatWeOffer from "./Offers";
 
 const Landing = () => {
     return (
         <div className="w-full overflow-hidden">
-            {/* Hero Section */}
             <div className="bg-gray-200 px-6 py-16 md:py-20 text-center flex flex-col items-center justify-center">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight max-w-3xl">
                     Streamlining Interdepartmental Cooperation
@@ -26,12 +24,10 @@ const Landing = () => {
                 </div>
             </div>
 
-            {/* What We Offer Section */}
             <div className="w-full">
                 <WhatWeOffer />
             </div>
 
-            {/* Training & Workshops Section */}
             <div className="bg-gray-100 px-6 py-16 md:py-20 text-center">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
                     Training & Capacity Building
@@ -47,7 +43,6 @@ const Landing = () => {
                 </Link>
             </div>
 
-            {/* Discussion Forum Section */}
             <div className="bg-white px-6 py-16 md:py-20 text-center">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6">
                     Discussion Forum

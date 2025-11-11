@@ -1,32 +1,47 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/Navbar.css";
 import { UserContext } from "../context/userContext";
 import logo from "../images/logo.png";
+import { db } from "../context/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 function Navbar() {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
   const role = user?.role ? "admin" : "junior-officer";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
-    const links = document.querySelectorAll(".dropdown-content a");
-    links.forEach((link) => {
-      const handleClick = (event) => {
-        event.preventDefault();
-        const department = link.textContent
-          .trim()
-          .toLowerCase()
-          .replace(/&/g, "and")
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9\-]/g, "");
-        window.location.href = `/department/${department}`;
-      };
-      link.addEventListener("click", handleClick);
-      return () => link.removeEventListener("click", handleClick);
-    });
+    const fetchDepartments = async () => {
+      try {
+        const deptCollectionRef = collection(db, "departments");
+        const snapshot = await getDocs(deptCollectionRef);
+        const deptList = snapshot.docs.map(doc => doc.data().departmentName);
+        deptList.sort();
+        setDepartments(deptList);
+      } catch (error) {
+        console.error("Error fetching departments: ", error);
+      }
+    };
+
+    fetchDepartments();
   }, []);
+
+  const formatDeptPath = (name) => {
+    return name
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9\-]/g, "");
+  };
+
+  const itemsPerColumn = Math.ceil(departments.length / 3);
+  const col1 = departments.slice(0, itemsPerColumn);
+  const col2 = departments.slice(itemsPerColumn, itemsPerColumn * 2);
+  const col3 = departments.slice(itemsPerColumn * 2);
 
   return (
     <nav className="navbar">
@@ -34,7 +49,6 @@ function Navbar() {
         <img src={logo} alt="Urban Setu Logo" className="logo-clickable" />
       </div>
 
-      {/* Hamburger icon */}
       <div
         className={`hamburger ${menuOpen ? "active" : ""}`}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -44,7 +58,6 @@ function Navbar() {
         <span></span>
       </div>
 
-      {/* Navbar Links */}
       <div className={`navbar-links ${menuOpen ? "active" : ""}`}>
         <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
 
@@ -52,45 +65,39 @@ function Navbar() {
           <a className="dropdown-toggle">Departments</a>
           <div className="dropdown-content">
             <div className="dropdown-section">
-              <a>Architecture Department</a>
-              <a>Advertisement</a>
-              <a>Assessment and Collection Department</a>
-              <a>Ayush Department</a>
-              <a>Building Department</a>
-              <a>Central Establishment</a>
-              <a>Committee and Corporation</a>
-              <a>Municipal Secretary Office</a>
-              <a>Organization and Method Department</a>
-              <a>Community Services</a>
+              {col1.map((dept) => (
+                <Link
+                  key={dept}
+                  to={`/department/${formatDeptPath(dept)}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {dept}
+                </Link>
+              ))}
             </div>
+
             <div className="dropdown-section">
-              <a>Directorate of Inquiry</a>
-              <a>Directorate of Press and Information</a>
-              <a>Department of Environmental Management</a>
-              <a>Education</a>
-              <a>Election Department</a>
-              <a>Engineering Department</a>
-              <a>Electrical and Mechanical Department</a>
-              <a>Public Health Department</a>
-              <a>Remunerative Project Cell</a>
-              <a>Statutory Audit Department</a>
-              <a>Factory License</a>
-              <a>Finance Department</a>
+              {col2.map((dept) => (
+                <Link
+                  key={dept}
+                  to={`/department/${formatDeptPath(dept)}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {dept}
+                </Link>
+              ))}
             </div>
+            
             <div className="dropdown-section">
-              <a>Hackney Carriage</a>
-              <a>Horticulture Department</a>
-              <a>Hospital Administration</a>
-              <a>Information Technology</a>
-              <a>Labour Welfare Department</a>
-              <a>Land and Estate</a>
-              <a>Language Department</a>
-              <a>Law Department</a>
-              <a>Licensing Department</a>
-              <a>Town Planning</a>
-              <a>Toll Tax</a>
-              <a>Veterinary</a>
-              <a>Vigilance</a>
+              {col3.map((dept) => (
+                <Link
+                  key={dept}
+                  to={`/department/${formatDeptPath(dept)}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {dept}
+                </Link>
+              ))}
             </div>
           </div>
         </div>

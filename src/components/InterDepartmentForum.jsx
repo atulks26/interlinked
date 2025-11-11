@@ -8,94 +8,71 @@ import {
 } from "react-icons/fa";
 import AdminSidebar from "../components/Sidebar";
 import { UserContext } from "../context/userContext";
+import { db } from "../context/firebase";
+import {
+  collection,
+  query,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  doc,
+  arrayUnion,
+  orderBy,
+  serverTimestamp,
+  getDocs,
+} from "firebase/firestore";
 
-const departments = [
-  "Architecture Department",
-  "Advertisement",
-  "Assessment and Collection Department",
-  "Ayush Department",
-  "Building Department",
-  "Central Establishment",
-  "Community Services",
-  "Engineering Department",
-  "Public Health Department",
-  "Finance Department",
-  "Information Technology",
-  "Transport Department",
-  "Environment and Sustainability",
-  "Urban Development",
-  "Planning & Coordination",
-];
+const TOXICITY_THRESHOLD = 0.7;
 
-const channels = [
-  "#general",
-  "#projects",
-  "#announcements",
-  "#updates",
-  "#team-chat",
-  "#documents",
-  "#support",
-];
+const checkToxicity = async (text) => {
+    if (!text) {
+        console.warn("Perspective API key not set or text is empty. Skipping check.");
+        return false; 
+    }
+    const API_URL = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${process.env.PERSPECTIVE_API_KEY}`;
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                comment: { text: text },
+                languages: ["en"],
+                requestedAttributes: { TOXICITY: {} },
+            }),
+        });
+        if (!response.ok) {
+            throw new Error(`Perspective API error: ${response.statusText}`);
+        }
+        const data = await response.json();
+        const toxicityScore = data.attributeScores.TOXICITY.summaryScore.value;
+        console.log("Toxicity Score:", toxicityScore);
+        return toxicityScore > TOXICITY_THRESHOLD;
+    } catch (error) {
+        console.error("Error calling Perspective API:", error);
+        return false;
+    }
+};
 
-const users = [
-  "Priyanshu",
-  "Atul",
-  "Ritika",
-  "Rahul",
-  "Pooja",
-  "Kiran",
-  "Ananya",
-  "Mohit",
-  "Devika",
-  "Laksh",
-  "Isha",
-];
-
-const messagesPool = [
-  "Please review the latest updates.",
-  "Any feedback on the recent changes?",
-  "Reminder: Submit your reports by EOD.",
-  "Project X completed successfully!",
-  "Meeting scheduled for 3 PM sharp.",
-  "Team, let's focus on the deadlines.",
-  "Make sure all documents are uploaded by tomorrow.",
-  "Great work on the new campaign!",
-  "We need to coordinate with the finance team.",
-  "Client requested a few modifications.",
-  "Let's set up a call to finalize the proposal.",
-  "Training session scheduled for next Monday.",
-  "Budget review will be held next week.",
-  "Please update your weekly reports.",
-  "Check the shared folder for updated templates.",
-];
-
-const generateMessages = (dept, channel) => {
-  const msgCount = Math.floor(Math.random() * 10) + 10;
-  return Array.from({ length: msgCount }, (_, i) => {
-    const user = users[Math.floor(Math.random() * users.length)];
-    return {
-      id: `${dept}-${channel}-${i}`,
-      author: user,
-      avatar: `https://i.pravatar.cc/40?u=${dept}-${i}`,
-      message: messagesPool[Math.floor(Math.random() * messagesPool.length)],
-      time: new Date(
-        Date.now() - Math.floor(Math.random() * 1000000000)
-      ).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      replies: [],
-    };
-  });
+const capitalizeWords = (str) => {
+    if (!str) return "";
+    return str
+      .toLowerCase()
+      .replace(/-/g, " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
 };
 
 const DepartmentForum = () => {
   const { user } = useContext(UserContext);
-  const [selectedDept, setSelectedDept] = useState(departments[0]);
-  const [selectedChannel, setSelectedChannel] = useState(channels[0]);
-  const [messages, setMessages] = useState(
-    generateMessages(departments[0], channels[0])
-  );
+
+  const [departments, setDepartments] = useState([]);
+  const [channels] = useState(["general", "projects", "announcements", "updates"]);
+  
+  const [selectedDept, setSelectedDept] = useState(null);
+  const [selectedChannel, setSelectedChannel] = useState("general");
+  
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [replyIndex, setReplyIndex] = useState(null);
   const [replyText, setReplyText] = useState("");
@@ -103,60 +80,131 @@ const DepartmentForum = () => {
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const chatEndRef = useRef(null);
 
+  const [isPosting, setIsPosting] = useState(false);
+
   useEffect(() => {
-    setMessages(generateMessages(selectedDept, selectedChannel));
+    const fetchDepartments = async () => {
+        try {
+            const deptCollectionRef = collection(db, "departments");
+            const snapshot = await getDocs(deptCollectionRef);
+            const deptList = snapshot.docs.map(doc => doc.data().departmentName);
+            setDepartments(deptList);
+            if (deptList.length > 0) {
+                setSelectedDept(deptList[0]);
+            }
+        } catch (error) {
+            console.error("Error fetching departments: ", error);
+        }
+    };
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedDept || !selectedChannel) return;
+    const messagesRef = collection(
+      db,
+      "chat-channels",
+      selectedDept,
+      selectedChannel
+    );
+
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        time: doc.data().timestamp?.toDate().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      }));
+      setMessages(msgs);
+    });
+
+    return () => unsubscribe();
   }, [selectedDept, selectedChannel]);
 
   useEffect(() => {
-    if (messages.length > 0 && messages[messages.length - 1].author === "You") {
+    if (messages.length > 0 && messages[messages.length - 1].authorName === user?.user_name) {
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, user?.user_name]);
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !user || isPosting || !selectedDept || !selectedChannel) return;
+    setIsPosting(true);
+
+    const isToxic = await checkToxicity(newMessage);
+    if (isToxic) {
+        alert("Your message was flagged for hateful content and was not posted. Please revise and try again.");
+        setIsPosting(false);
+        return;
+    }
+
     const msg = {
-      id: `msg-${Date.now()}`,
-      author: "You",
-      avatar: `https://i.pravatar.cc/40?u=you-${Date.now()}`,
+      authorName: user.user_name || "Anonymous",
+      authorId: user.userId || null,
+      authorDept: user.department ? capitalizeWords(user.department) : "Unknown Dept",
+      authorRole: user.role ? capitalizeWords(user.role) : "User",
+      avatar: `https://i.pravatar.cc/40?u=${user.userId}`,
       message: newMessage,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      timestamp: serverTimestamp(),
       replies: [],
     };
-    setMessages([...messages, msg]);
-    setNewMessage("");
+
+    try {
+      const messagesRef = collection(db, "chat-channels", selectedDept, selectedChannel);
+
+      await addDoc(messagesRef, msg);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message: ", error);
+      alert("Failed to send message.");
+    }
+    setIsPosting(false);
   };
 
-  const handleSendReply = (index) => {
-    if (!replyText.trim()) return;
+  const handleSendReply = async (index) => {
+    if (!replyText.trim() || !user || isPosting || !selectedDept || !selectedChannel) return;
+    setIsPosting(true);
+
+    const isToxic = await checkToxicity(replyText);
+    if (isToxic) {
+        alert("Your reply was flagged for hateful content and was not posted. Please revise and try again.");
+        setIsPosting(false);
+        return;
+    }
+
+    const messageToReply = messages[index];
+    if (!messageToReply || !messageToReply.id) return;
+
+    const msgDocRef = doc(db, "chat-channels", selectedDept, selectedChannel, messageToReply.id);
+
     const newReply = {
       id: `reply-${Date.now()}`,
-      user: "You",
+      user: user.user_name || "You",
       message: replyText,
-      time: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
-    const updatedMessages = messages.map((msg, i) => {
-      if (i === index) {
-        return { ...msg, replies: [...msg.replies, newReply] };
-      }
-      return msg;
-    });
-    setMessages(updatedMessages);
-    setReplyText("");
-    setReplyIndex(null);
+
+    try {
+      await updateDoc(msgDocRef, {
+        replies: arrayUnion(newReply),
+      });
+      setReplyText("");
+      setReplyIndex(null);
+    } catch (error) {
+      console.error("Error sending reply: ", error);
+      alert("Failed to send reply.");
+    }
+    setIsPosting(false);
   };
 
   const toggleSidebar = () => setLeftSidebarOpen((prev) => !prev);
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden relative">
-      {/* LEFT SIDEBAR */}
       <div
         className={`fixed md:static z-50 h-full transform transition-transform duration-300
           ${leftSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
@@ -164,7 +212,7 @@ const DepartmentForum = () => {
         <AdminSidebar />
       </div>
 
-      {leftSidebarOpen && (        <div
+      {leftSidebarOpen && (<div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
           onClick={() => setLeftSidebarOpen(false)}
         ></div>
@@ -193,7 +241,7 @@ const DepartmentForum = () => {
 
         <div className="bg-white p-4 rounded-lg shadow mb-4 flex justify-between items-center flex-shrink-0">
           <h2 className="text-xl font-semibold text-gray-800">
-            {selectedDept} {selectedChannel}
+            {selectedDept ? `${selectedDept} - #${selectedChannel}` : "Loading..."}
           </h2>
           <span className="text-gray-500 text-sm">{messages.length} messages</span>
         </div>
@@ -205,7 +253,12 @@ const DepartmentForum = () => {
                 <img src={msg.avatar} alt="" className="w-10 h-10 rounded-full" />
                 <div className="flex-1">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800">{msg.author}</h3>
+                    <div>
+                        <h3 className="font-semibold text-gray-800">{msg.authorName}</h3>
+                        <span className="text-xs text-gray-500">
+                          {msg.authorRole} - {msg.authorDept}
+                        </span>
+                    </div>
                     <span className="text-xs text-gray-400">{msg.time}</span>
                   </div>
                   <p className="mt-1 text-gray-700">{msg.message}</p>
@@ -242,11 +295,12 @@ const DepartmentForum = () => {
                         className="flex-1 border rounded px-3 py-2 focus:outline-blue-400"
                         value={replyText}
                         onChange={(e) => setReplyText(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSendReply(index)}
+                        onKeyDown={(e) => e.key === "Enter" && !isPosting && handleSendReply(index)}
                       />
                       <button
                         onClick={() => handleSendReply(index)}
                         className="bg-blue-600 text-white px-4 py-2 rounded"
+                        disabled={isPosting}
                       >
                         <FaPaperPlane />
                       </button>
@@ -263,16 +317,18 @@ const DepartmentForum = () => {
           <input
             type="text"
             className="flex-1 border rounded px-4 py-2 focus:outline-blue-400"
-            placeholder={`Message ${selectedDept}...`}
+            placeholder={selectedDept ? `Message ${selectedDept}...` : "Select a department"}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && !isPosting && handleSendMessage()}
+            disabled={!selectedDept || isPosting}
           />
           <button
             onClick={handleSendMessage}
             className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            disabled={!selectedDept || isPosting}
           >
-            <FaPaperPlane />
+            {isPosting ? "..." : <FaPaperPlane />}
           </button>
         </div>
       </div>
@@ -320,7 +376,7 @@ const DepartmentForum = () => {
                   selectedChannel === ch ? "bg-blue-200 font-semibold" : "text-gray-700"
                 }`}
               >
-                {ch}
+                #{ch}
               </li>
             ))}
           </ul>

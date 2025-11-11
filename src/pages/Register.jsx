@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore"; // Import serverTimestamp
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../context/firebase";
 
 const RegistrationForm = () => {
@@ -30,7 +30,6 @@ const RegistrationForm = () => {
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
-        // Explicitly handle file inputs to avoid accidental truthy checks
         if (type === "file") {
             const file = files && files.length > 0 ? files[0] : null;
             setFormData({ ...formData, [name]: file });
@@ -49,10 +48,8 @@ const RegistrationForm = () => {
 
         setIsSubmitting(true);
 
-        // Log current state to help debugging unexpected alerts
         console.debug("Register submit", { step, totalSteps, formData });
 
-        // Explicit required fields list for clarity
         const requiredFields = [
             "departmentName",
             "departmentType",
@@ -77,7 +74,6 @@ const RegistrationForm = () => {
         });
 
         if (missing.length > 0) {
-            // Give a clear list of what's missing instead of a generic message
             alert(
                 `Please complete the following fields before submitting: ${missing.join(
                     ", "
@@ -95,7 +91,6 @@ const RegistrationForm = () => {
 
         let createdUser = null;
         try {
-            // 1. Create the user in Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(
                 auth,
                 formData.email,
@@ -103,15 +98,13 @@ const RegistrationForm = () => {
             );
             createdUser = userCredential.user;
 
-            // 2. Generate a clean department ID (e.g., "Public Health" -> "public-health")
             const departmentId = formData.departmentName
                 .toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, "") // Remove special chars
-                .replace(/[\s_-]+/g, "-") // Replace spaces/underscores with a dash
+                .replace(/[^a-z0-9\s-]/g, "")
+                .replace(/[\s_-]+/g, "-")
                 .trim();
 
             if (!departmentId) {
-                // Clean up the created auth user to avoid orphan accounts
                 try {
                     await createdUser.delete();
                 } catch (delErr) {
@@ -122,27 +115,25 @@ const RegistrationForm = () => {
                 return;
             }
 
-            // 3. Add the Admin to the top-level 'users' collection
             const userDocRef = doc(db, "users", createdUser.uid);
             await setDoc(userDocRef, {
                 userId: createdUser.uid,
                 user_name: formData.contactPerson,
                 email: formData.email,
-                department: departmentId, // Save the clean department ID
-                role: "admin", // This is the department admin
+                department: departmentId,
+                role: "admin",
                 contactPosition: formData.contactPosition,
                 phoneNumber: formData.phoneNumber,
                 createdAt: serverTimestamp(),
             });
 
-            // 4. Create the Department in the top-level 'departments' collection
             const deptDocRef = doc(db, "departments", departmentId);
             await setDoc(deptDocRef, {
                 departmentName: formData.departmentName,
                 departmentType: formData.departmentType,
                 registrationNumber: formData.registrationNumber,
                 address: formData.address,
-                adminId: createdUser.uid, // Link to the admin user
+                adminId: createdUser.uid,
                 adminName: formData.contactPerson,
                 createdAt: serverTimestamp(),
             });
@@ -152,7 +143,6 @@ const RegistrationForm = () => {
         } catch (error) {
             console.error("Error registering user:", error);
 
-            // If we created an auth user but something else failed, attempt cleanup
             if (createdUser) {
                 try {
                     await createdUser.delete();

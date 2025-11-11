@@ -197,7 +197,6 @@ const Sidebar = ({ type = "admin", handleLogout }) => {
         ))}
       </nav>
 
-      {/* Logout Button */}
       <div className="mt-auto pt-4 border-t border-gray-700">
         <button
           onClick={handleLogout}

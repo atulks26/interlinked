@@ -4,14 +4,14 @@ import {
   FaSearch,
   FaSortAlphaDown,
   FaSortAlphaUp,
-  FaTrash, // Removed FaEdit
   FaSpinner, 
 } from "react-icons/fa";
 import ProfileImg from "../images/profile.png";
 import Sidebar from "../components/Sidebar";
 import { UserContext } from "../context/userContext";
-import { db } from "../context/firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { db, app } from "../context/firebase";
+import { initializeApp, deleteApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import {
   doc,
   setDoc,
@@ -19,8 +19,6 @@ import {
   query,
   where,
   onSnapshot,
-  updateDoc, // No longer needed, but safe to keep
-  deleteDoc,
   serverTimestamp,
   addDoc 
 } from "firebase/firestore";
@@ -30,14 +28,10 @@ const ManageJunior = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  // const [showEditModal, setShowEditModal] = useState(false); // Removed
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedOfficer, setSelectedOfficer] = useState(null);
 
   const [officers, setOfficers] = useState([]);
   const [isLoading, setIsLoading] = useState(true); 
 
-  // --- Activity Logger Function ---
   const logActivity = async (action, target_name, target_id = null) => {
     if (!user || !user.department) return;
     try {
@@ -55,7 +49,6 @@ const ManageJunior = () => {
     }
   };
 
-  // --- FETCH OFFICERS FROM FIRESTORE ---
   useEffect(() => {
     if (!user || !user.department) {
       setIsLoading(true); 
@@ -85,7 +78,6 @@ const ManageJunior = () => {
     return () => unsubscribe();
   }, [user]); 
 
-  // --- ADD OFFICER (Logs activity) ---
   const handleAddOfficer = async (e) => {
     e.preventDefault();
     if (!user || !user.department) {
@@ -108,10 +100,17 @@ const ManageJunior = () => {
       return;
     }
 
+    const tempAppConfig = app.options;
+    const tempAppName = `temp-user-creation-${Date.now()}`;
+    let tempApp;
+    let tempAuth;
+
     try {
-      const auth = getAuth();
+      tempApp = initializeApp(tempAppConfig, tempAppName);
+      tempAuth = getAuth(tempApp);
+
       const userCredential = await createUserWithEmailAndPassword(
-        auth,
+        tempAuth,
         email,
         password
       );
@@ -138,37 +137,20 @@ const ManageJunior = () => {
     } catch (error) {
       console.error("Error adding officer:", error);
       alert(`Failed to add officer: ${error.message}`);
+    } finally {
+      try {
+        if (tempAuth) {
+          await signOut(tempAuth); 
+        }
+        if (tempApp) {
+          await deleteApp(tempApp); 
+        }
+      } catch (cleanupError) {
+        console.error("Error cleaning up temp auth app:", cleanupError);
+      }
     }
   };
 
-  // --- EDIT OFFICER (Function Removed) ---
-  // const handleEditOfficer = ... (REMOVED)
-
-  // --- DELETE OFFICER (Logs activity) ---
-  const handleDeleteOfficer = async () => {
-    if (!selectedOfficer) return;
-
-    // --- WARNING ---
-    // This function ONLY deletes the Firestore document, not the user's
-    // login account. This will orphan the auth account.
-    // A Firebase Cloud Function is required to delete auth accounts.
-    // --- END WARNING ---
-
-    try {
-      const officerDocRef = doc(db, "users", selectedOfficer.id);
-      await deleteDoc(officerDocRef);
-      
-      await logActivity("deleted_officer", selectedOfficer.user_name, selectedOfficer.id);
-      
-      setShowDeleteModal(false);
-      alert("Officer deleted from database.");
-    } catch (error) {
-      console.error("Error deleting officer:", error);
-      alert("Failed to delete officer.");
-    }
-  };
-
-  // Filtering and sorting
   const filteredOfficers = officers
     .filter(
       (e) =>
@@ -204,7 +186,6 @@ const ManageJunior = () => {
           </div>
         </div>
 
-        {/* Search */}
         <div className="mb-4 relative w-full max-w-md">
           <input
             type="search"
@@ -216,7 +197,6 @@ const ManageJunior = () => {
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
 
-        {/* --- Officers Grid (Updated with loading state) --- */}
         {isLoading ? (
             <div className="flex justify-center items-center h-64">
                 <FaSpinner className="animate-spin text-4xl text-gray-500" />
@@ -243,25 +223,6 @@ const ManageJunior = () => {
                     </p>
 
                     <div className="flex gap-2 mt-2">
-                      {/* --- EDIT BUTTON REMOVED --- */}
-                      {/* <button
-                          onClick={() => {
-                          setSelectedOfficer(emp);
-                          setShowEditModal(true);
-                          }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1"
-                      >
-                          <FaEdit /> Edit
-                      </button> */}
-                      <button
-                          onClick={() => {
-                          setSelectedOfficer(emp);
-                          setShowDeleteModal(true);
-                          }}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded flex items-center gap-1"
-                      >
-                          <FaTrash /> Delete
-                      </button>
                     </div>
                 </div>
                 ))
@@ -272,7 +233,6 @@ const ManageJunior = () => {
         )}
       </div>
 
-      {/* --- Add Modal (Unchanged) --- */}
       {showAddModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
@@ -329,43 +289,6 @@ const ManageJunior = () => {
         </div>
       )}
 
-      {/* --- EDIT MODAL REMOVED --- */}
-      {/* {showEditModal && ... (REMOVED)} */}
-
-      {/* --- Delete Modal (Unchanged) --- */}
-      {showDeleteModal && selectedOfficer && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <div
-            className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-lg font-bold mb-3">Confirm Delete</h2>
-            <p className="mb-4">
-              Are you sure you want to delete{" "}
-              <strong>{selectedOfficer.user_name}</strong>?
-              <br />
-              <strong className="text-red-600">Warning:</strong> This only deletes the database record, not their login.
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteOfficer}
-                className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

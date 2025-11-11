@@ -398,7 +398,6 @@ const ProjectEditModal = ({ project, onClose, onSave, setProjectModal }) => (
             <input
                 type="date"
                 className="w-full mb-3 border rounded p-2"
-                // Handle both string (from input) and Firestore Timestamp (from db)
                 value={project.startDate?.toDate ? project.startDate.toDate().toISOString().split('T')[0] : project.startDate || ''}
                 onChange={(e) => setProjectModal({ ...project, startDate: e.target.value })}
                 required

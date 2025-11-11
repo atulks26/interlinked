@@ -31,7 +31,6 @@ h2 {
   text-transform: uppercase;
 }
 
-/* Input group styling */
 .input-group {
   margin-bottom: 20px;
   text-align: center;
@@ -62,7 +61,6 @@ h2 {
   outline: none;
 }
 
-/* CAPTCHA Group */
 .captcha-group {
   margin-bottom: 30px;
   text-align: center;
@@ -73,7 +71,7 @@ h2 {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  flex-wrap: wrap; /* Allows wrapping on small screens */
+  flex-wrap: wrap;
   margin-top: 10px;
 }
 
@@ -85,6 +83,10 @@ h2 {
   border-radius: 8px;
   border: 2px solid #ccc;
   color: #333;
+}
+
+.captcha-group input {
+  margin-top: 2rem;
 }
 
 .refresh-captcha {
@@ -106,7 +108,6 @@ h2 {
   transform: scale(0.95);
 }
 
-/* CAPTCHA Input */
 .captcha-input-container {
   display: flex;
   flex-direction: column;
@@ -151,9 +152,6 @@ h2 {
   background-color: #0056b3;
 }
 
-/* ------------------------------
-   RESPONSIVE DESIGN
---------------------------------*/
 @media (max-width: 768px) {
   .login-box {
     padding: 25px;
