@@ -29,7 +29,7 @@ const checkToxicity = async (text) => {
         console.warn("Perspective API key not set or text is empty. Skipping check.");
         return false; 
     }
-    const API_URL = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${process.env.PERSPECTIVE_API_KEY}`;
+    const API_URL = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${process.env.REACT_APP_PERSPECTIVE_KEY}`;
     try {
         const response = await fetch(API_URL, {
             method: "POST",
